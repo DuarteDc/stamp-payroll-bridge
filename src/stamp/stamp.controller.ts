@@ -6,18 +6,39 @@ import {
   Patch,
   Param,
   Delete,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
+  FileTypeValidator,
+  HttpCode,
 } from '@nestjs/common';
 import { StampService } from './stamp.service';
-import { CreateStampDto } from './dto/create-stamp.dto';
 import { UpdateStampDto } from './dto/update-stamp.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { UnzipService } from 'src/unzip/unzip/unzip.service';
 
 @Controller('stamp')
 export class StampController {
-  constructor(private readonly stampService: StampService) {}
+  constructor(
+    private readonly stampService: StampService,
+    private readonly unzipService: UnzipService,
+  ) {}
 
-  @Post()
-  create(@Body() createStampDto: CreateStampDto) {
-    return this.stampService.create(createStampDto);
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  @HttpCode(202)
+  create(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [new FileTypeValidator({ fileType: 'application/zip' })],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    const outputPath = './uploads';
+
+    this.unzipService.unzipFile(file, outputPath);
+    return { message: 'File is being processed' };
   }
 
   @Get()
