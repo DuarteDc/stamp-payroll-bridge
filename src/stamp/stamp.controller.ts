@@ -35,7 +35,7 @@ export class StampController {
     )
     file: Express.Multer.File,
   ) {
-    const outputPath = './uploads';
+    const outputPath = `./uploads/${new Date().getTime()}-${file.originalname}`;
 
     this.unzipService.unzipFile(file, outputPath);
     return { message: 'File is being processed' };
