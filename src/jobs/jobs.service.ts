@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './entities/job.entity';
 import { Repository } from 'typeorm';
-import { CreateJobDto } from './dtos/create-job.dto';
 
 @Injectable()
 export class JobsService {
@@ -11,7 +10,13 @@ export class JobsService {
     private readonly jobRepository: Repository<Job>,
   ) {}
 
-  create(createJobDto: CreateJobDto) {
-    return this.jobRepository.create(createJobDto);
+  async createDefaultJob(): Promise<Job> {
+    const job = await this.jobRepository.save({
+      tenantId: 1,
+      externalReference: 'default_ref',
+      status: 'RECEIVED',
+    });
+
+    return job;
   }
 }

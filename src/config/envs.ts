@@ -5,11 +5,25 @@ import * as joi from 'joi';
 
 interface EnvVars {
   PORT: number;
+  DB_HOST: string;
+  DB_USERNAME: string;
+  DB_PASSWORD: string;
+  DB_SID: string;
+  DB_PORT: number;
+  DB_SYNCHRONIZE: boolean;
+  DB_SCHEMA: string;
 }
 
 const envVarsSchema = joi
   .object({
     PORT: joi.number().default(3000),
+    DB_HOST: joi.string().required(),
+    DB_USERNAME: joi.string().required(),
+    DB_PASSWORD: joi.string().required(),
+    DB_SID: joi.string().required(),
+    DB_PORT: joi.number().default(1521),
+    DB_SYNCHRONIZE: joi.boolean().default(true),
+    DB_SCHEMA: joi.string().required(),
   })
   .unknown(true);
 
@@ -23,4 +37,11 @@ const envVars: EnvVars = value;
 
 export const envs = {
   port: envVars.PORT,
+  dbHost: envVars.DB_HOST,
+  dbUsername: envVars.DB_SCHEMA,
+  dbPassword: envVars.DB_PASSWORD,
+  dbSid: envVars.DB_SID,
+  dbPort: envVars.DB_PORT,
+  dbSynchronize: envVars.DB_SYNCHRONIZE,
+  dbSchema: envVars.DB_SCHEMA,
 };

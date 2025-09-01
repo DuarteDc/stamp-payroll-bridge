@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { JobEvent } from './job-event.entity';
 
 export enum JobStatus {
   RECEIVED = 'RECEIVED',
@@ -8,29 +9,35 @@ export enum JobStatus {
   ERROR = 'ERROR',
 }
 
-@Entity()
+@Entity({ name: 'JOBS' })
 export class Job {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
 
-  @Column()
-  tenant_id: number;
+  @Column({
+    name: 'TENANT_ID',
+  })
+  tenantId: number;
 
-  @Column()
-  external_reference: string;
+  @Column({ name: 'EXTERNAL_REFERENCE' })
+  externalReference: string;
 
   @Column({
-    type: 'enum',
-    enum: JobStatus,
+    name: 'STATUS',
+    type: 'varchar2',
     default: JobStatus.RECEIVED,
   })
   status: string;
 
   @Column({
-    type: 'datetime',
+    name: 'CREATED_AT',
+    type: 'timestamp',
     default: () => 'CURRENT_TIMESTAMP',
   })
-  created_at: Date;
+  createdAt: Date;
+
+  @OneToMany(() => JobEvent, (jobEvent) => jobEvent.job, { cascade: false })
+  jobEvents: JobEvent[];
 }
 
 //jobs: id, tenant_id, referencia_externa, status( RECEIVED|SEALED|SUBMITTED|TIMBRADO|ERROR ), created_at

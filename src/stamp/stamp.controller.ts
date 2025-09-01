@@ -38,7 +38,7 @@ export class StampController {
     )
     file: Express.Multer.File,
   ) {
-    const job = this.jobsService.create({});
+    const job = await this.jobsService.createDefaultJob();
 
     const processId = await firstValueFrom(
       this.clientSatService.send({ cmd: 'process_file' }, { data: file }),
