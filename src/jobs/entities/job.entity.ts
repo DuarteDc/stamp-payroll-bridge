@@ -1,5 +1,13 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { JobEvent } from './job-event.entity';
+import { Tenant } from 'src/tenant/entities';
 
 export enum JobStatus {
   RECEIVED = 'RECEIVED',
@@ -13,11 +21,6 @@ export enum JobStatus {
 export class Job {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
-
-  @Column({
-    name: 'TENANT_ID',
-  })
-  tenantId: number;
 
   @Column({ name: 'EXTERNAL_REFERENCE' })
   externalReference: string;
@@ -38,6 +41,13 @@ export class Job {
 
   @OneToMany(() => JobEvent, (jobEvent) => jobEvent.job, { cascade: false })
   jobEvents: JobEvent[];
+
+  @ManyToOne(() => Tenant, (tenant) => tenant.jobs, { cascade: false })
+  @JoinColumn({
+    name: 'TENANT_ID',
+    foreignKeyConstraintName: 'fk_job_tenant',
+  })
+  tenant: Tenant;
 }
 
 //jobs: id, tenant_id, referencia_externa, status( RECEIVED|SEALED|SUBMITTED|TIMBRADO|ERROR ), created_at

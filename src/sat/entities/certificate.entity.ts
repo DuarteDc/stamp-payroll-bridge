@@ -1,4 +1,4 @@
-import { TenantEntity } from 'src/tenant/entities/tenant.entity';
+import { Tenant } from 'src/tenant/entities/tenant.entity';
 import {
   Column,
   Entity,
@@ -24,12 +24,12 @@ export class Certificates {
   @Column({ name: 'TYPE', type: 'varchar2', default: TypeCertificate.CSD })
   type: string;
 
-  @ManyToOne(() => TenantEntity, (tenant) => tenant.certificates)
+  @ManyToOne(() => Tenant, (tenant) => tenant.certificates)
   @JoinColumn({
     name: 'TENANT_ID',
     foreignKeyConstraintName: 'fk_certificate_tenant',
   })
-  tenant: TenantEntity;
+  tenant: Tenant;
 
   @Column({ name: 'SERIAL_NUMBER' })
   serialNumber: string;

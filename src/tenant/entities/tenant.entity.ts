@@ -1,3 +1,4 @@
+import { Job } from 'src/jobs/entities';
 import { Certificates } from 'src/sat/entities';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
@@ -7,7 +8,7 @@ export enum Status {
 }
 
 @Entity({ name: 'TENANTS' })
-export class TenantEntity {
+export class Tenant {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
 
@@ -29,4 +30,7 @@ export class TenantEntity {
 
   @OneToMany(() => Certificates, (certificate) => certificate.tenant)
   certificates: Certificates[];
+
+  @OneToMany(() => Job, (job) => job.tenant)
+  jobs: Job[];
 }

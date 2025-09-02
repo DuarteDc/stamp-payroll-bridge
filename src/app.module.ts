@@ -10,6 +10,7 @@ import { JobEvent } from './jobs/entities';
 import { SatModule } from './sat/sat.module';
 import { Certificates } from './sat/entities';
 import { TenantModule } from './tenant/tenant.module';
+import { Tenant } from './tenant/entities';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { TenantModule } from './tenant/tenant.module';
       port: envs.dbPort,
       username: envs.dbSchema,
       password: envs.dbPassword,
-      entities: [Job, JobEvent, Certificates],
+      entities: [Job, JobEvent, Certificates, Tenant],
       synchronize: true,
     }),
     SatModule,

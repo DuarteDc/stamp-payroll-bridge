@@ -1,0 +1,11 @@
+services:
+  db:
+    image: gvenzl/oracle-xe
+    ports:
+      - 1521:1521
+      - 5000:500
+    container_name: oracle-xe
+    environment:
+      - ORACLE_PASSWORD=MiPasswordSeguro
+    volumes:
+      - ./data:/opt/oracle/oradata
