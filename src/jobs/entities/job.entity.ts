@@ -7,7 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { JobEvent } from './job-event.entity';
-import { Tenant } from 'src/tenant/entities';
+import { Tenant } from '../../tenant/entities';
 
 export enum JobStatus {
   RECEIVED = 'RECEIVED',

@@ -1,5 +1,5 @@
-import { Job } from 'src/jobs/entities';
-import { Certificates } from 'src/sat/entities';
+import { Job } from '../../jobs/entities';
+import { Certificates } from '../../sat/entities';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Status {
