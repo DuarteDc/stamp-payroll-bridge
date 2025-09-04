@@ -5,7 +5,7 @@ export const TenantFactory = setSeederFactory(Tenant, (faker) => {
   const tenant = new Tenant();
 
   tenant.name = faker.person.fullName();
-  tenant.rfc = faker.string.alphanumeric();
+  tenant.rfc = faker.string.alphanumeric(13).toUpperCase();
   tenant.status = '1';
 
   return tenant;
