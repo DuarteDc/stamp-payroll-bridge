@@ -4,7 +4,7 @@ import { UpdateStampDto } from './dto/update-stamp.dto';
 
 @Injectable()
 export class StampService {
-  create(createStampDto: CreateStampDto) {
+  create() {
     return 'This action adds a new stamp';
   }
 
@@ -16,7 +16,7 @@ export class StampService {
     return `This action returns a #${id} stamp`;
   }
 
-  update(id: number, updateStampDto: UpdateStampDto) {
+  update(id: number) {
     return `This action updates a #${id} stamp`;
   }
 
