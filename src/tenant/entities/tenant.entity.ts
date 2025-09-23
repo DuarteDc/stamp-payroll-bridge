@@ -1,5 +1,5 @@
 import { Job } from '../../jobs/entities';
-import { Certificates } from '../../sat/entities';
+import { Certificate } from '../../sat/entities';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Status {
@@ -28,8 +28,8 @@ export class Tenant {
   })
   createdAt: Date;
 
-  @OneToMany(() => Certificates, (certificate) => certificate.tenant)
-  certificates: Certificates[];
+  @OneToMany(() => Certificate, (certificate) => certificate.tenant)
+  certificates: Certificate[];
 
   @OneToMany(() => Job, (job) => job.tenant)
   jobs: Job[];

@@ -12,6 +12,9 @@ interface EnvVars {
   DB_PORT: number;
   DB_SYNCHRONIZE: boolean;
   DB_SCHEMA: string;
+  SAT_RECEPTION_WSDL: string;
+  SAT_CONSULTATION_WSDL: string;
+  SAT_CANCELATION_WSDL: string;
 }
 
 const envVarsSchema = joi
@@ -24,6 +27,9 @@ const envVarsSchema = joi
     DB_PORT: joi.number().default(1521),
     DB_SYNCHRONIZE: joi.boolean().default(true),
     DB_SCHEMA: joi.string().required(),
+    SAT_RECEPTION_WSDL: joi.string().uri(),
+    SAT_CONSULTATION_WSDL: joi.string().uri(),
+    SAT_CANCELATION_WSDL: joi.string().uri(),
   })
   .unknown(true);
 
@@ -44,4 +50,7 @@ export const envs = {
   dbPort: envVars.DB_PORT,
   dbSynchronize: envVars.DB_SYNCHRONIZE,
   dbSchema: envVars.DB_SCHEMA,
+  satReceptionWsdl: envVars.SAT_RECEPTION_WSDL,
+  satConsultationWsdl: envVars.SAT_CONSULTATION_WSDL,
+  satCancelationWsdl: envVars.SAT_CANCELATION_WSDL,
 };

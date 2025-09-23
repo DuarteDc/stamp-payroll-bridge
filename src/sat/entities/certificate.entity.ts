@@ -17,7 +17,7 @@ export enum Status {
   FALSE = '0',
 }
 @Entity({ name: 'CERTIFICATES' })
-export class Certificates {
+export class Certificate {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
 

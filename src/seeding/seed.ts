@@ -3,8 +3,10 @@ import { runSeeders, SeederOptions } from 'typeorm-extension';
 import { envs } from '../config/envs';
 import { MainSeeder } from './main.seeder';
 import { Tenant } from '../tenant/entities';
-import { Certificates } from '../sat/entities';
+import { Certificate } from '../sat/entities';
 import { Job, JobEvent } from '../jobs/entities';
+import { TenantFactory } from './tenant.factory';
+import { CertificateFactory } from './certificate.factory';
 void (async () => {
   const options: DataSourceOptions & SeederOptions = {
     type: 'oracle',
@@ -13,13 +15,16 @@ void (async () => {
     username: envs.dbSchema,
     password: envs.dbPassword,
     //entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    entities: [Tenant, Certificates, Job, JobEvent],
+    entities: [Tenant, Certificate, Job, JobEvent],
     synchronize: true,
+    dropSchema: true,
     seeds: [MainSeeder],
-    factories: ['src/seeding/**/*.factory{.ts,.js}'],
+    factories: [TenantFactory, CertificateFactory],
   };
 
   const datasource = new DataSource(options);
   await datasource.initialize();
   await runSeeders(datasource);
+  console.log('Seeding successfully!!!!!');
+  process.exit();
 })();

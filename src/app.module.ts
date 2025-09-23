@@ -8,7 +8,7 @@ import { Job } from './jobs/entities/job.entity';
 import { envs } from './config/envs';
 import { JobEvent } from './jobs/entities';
 import { SatModule } from './sat/sat.module';
-import { Certificates } from './sat/entities';
+import { Certificate } from './sat/entities';
 import { TenantModule } from './tenant/tenant.module';
 import { Tenant } from './tenant/entities';
 
@@ -22,7 +22,7 @@ import { Tenant } from './tenant/entities';
       port: envs.dbPort,
       username: envs.dbSchema,
       password: envs.dbPassword,
-      entities: [Job, JobEvent, Certificates, Tenant],
+      entities: [Job, JobEvent, Certificate, Tenant],
       synchronize: true,
     }),
     SatModule,

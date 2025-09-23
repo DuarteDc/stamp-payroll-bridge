@@ -1,1 +1,1 @@
-export { Certificates } from './certificate.entity';
+export { Certificate } from './certificate.entity';

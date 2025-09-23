@@ -16,8 +16,11 @@ import { UnzipService } from 'src/unzip/unzip/unzip.service';
 import { SAT_SERVICE } from 'src/config';
 import { ClientProxy } from '@nestjs/microservices';
 
-import { firstValueFrom } from 'rxjs';
 import { JobsService } from 'src/jobs/jobs.service';
+
+interface Parmas {
+  id: string;
+}
 @Controller('stamp')
 export class StampController {
   constructor(
@@ -27,10 +30,11 @@ export class StampController {
     private readonly jobsService: JobsService,
   ) {}
 
-  @Post('upload')
+  @Post('upload/:id')
   @UseInterceptors(FileInterceptor('file'))
   @HttpCode(202)
   async create(
+    @Param() params: Parmas,
     @UploadedFile(
       new ParseFilePipe({
         validators: [new FileTypeValidator({ fileType: 'application/zip' })],
@@ -38,12 +42,7 @@ export class StampController {
     )
     file: Express.Multer.File,
   ) {
-    const job = await this.jobsService.createDefaultJob();
-
-    const processId = await firstValueFrom(
-      this.clientSatService.send({ cmd: 'process_file' }, { data: file }),
-    );
-    console.log({ processId });
+    const job = await this.jobsService.createDefaultJob(params.id);
     return {
       message: `Processing started with ID: ${job.id}`,
     };

@@ -5,6 +5,7 @@ import { UnzipModule } from 'src/unzip/unzip.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { SAT_SERVICE } from 'src/config';
 import { JobsModule } from 'src/jobs/jobs.module';
+import { SatModule } from 'src/sat/sat.module';
 
 @Module({
   controllers: [StampController],
@@ -12,6 +13,7 @@ import { JobsModule } from 'src/jobs/jobs.module';
   imports: [
     UnzipModule,
     JobsModule,
+    SatModule,
     ClientsModule.register([
       {
         name: SAT_SERVICE,
