@@ -5,7 +5,14 @@ services:
       - 1521:1521
       - 5000:500
     container_name: oracle-xe
+    restart: unless-stop
     environment:
       - ORACLE_PASSWORD=MiPasswordSeguro
     volumes:
       - ./data:/opt/oracle/oradata
+  redis:
+    image: redis-server
+    container_name: redis
+    ports:
+      - 6379:6379
+    restart: unless-stop
