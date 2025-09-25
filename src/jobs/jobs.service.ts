@@ -11,7 +11,13 @@ import {
 import { SatService } from 'src/sat/sat.service';
 import { JobActions } from 'src/common/jobs/constants/job-action.constant';
 import { JobEvent } from './entities';
-
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
+interface PollingQueueData {
+  packageId: string;
+  rfc: string;
+  jobId: string;
+}
 @Injectable()
 export class JobsService {
   constructor(
@@ -22,6 +28,8 @@ export class JobsService {
     @InjectRepository(JobEvent)
     private readonly jobEventRepository: Repository<JobEvent>,
     private readonly satService: SatService,
+    @InjectQueue('polling')
+    private readonly pollingQueue: Queue<PollingQueueData>,
   ) {}
 
   async createDefaultJob(tenantId: string): Promise<Job> {
@@ -58,6 +66,15 @@ export class JobsService {
         data: newPackage,
       },
     });
+
+    await this.pollingQueue.add(
+      'verify-status',
+      { packageId: newPackage.IdPaquete, jobId: job.id, rfc: tenant.rfc },
+      {
+        attempts: 1,
+      },
+    );
+
     return job;
   }
 

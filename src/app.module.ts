@@ -12,6 +12,9 @@ import { Certificate } from './sat/entities';
 import { TenantModule } from './tenant/tenant.module';
 import { Tenant } from './tenant/entities';
 
+import { BullModule } from '@nestjs/bullmq';
+import { JobsProcessor } from './jobs/jobs.processor';
+
 @Module({
   imports: [
     StampModule,
@@ -27,8 +30,14 @@ import { Tenant } from './tenant/entities';
     }),
     SatModule,
     TenantModule,
+    BullModule.forRoot({
+      connection: {
+        host: 'localhost',
+        port: 6379,
+      },
+    }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, JobsProcessor],
 })
 export class AppModule {}
