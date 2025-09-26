@@ -6,6 +6,7 @@ import { Tenant } from 'src/tenant/entities';
 import { SatModule } from 'src/sat/sat.module';
 import { JobEvent } from './entities';
 import { BullModule } from '@nestjs/bullmq';
+import { JobsProcessor } from './jobs.processor';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { BullModule } from '@nestjs/bullmq';
       name: 'polling',
     }),
   ],
-  providers: [JobsService],
+  providers: [JobsService, JobsProcessor],
   exports: [JobsService],
 })
 export class JobsModule {}

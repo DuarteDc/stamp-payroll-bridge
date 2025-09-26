@@ -13,7 +13,7 @@ import { TenantModule } from './tenant/tenant.module';
 import { Tenant } from './tenant/entities';
 
 import { BullModule } from '@nestjs/bullmq';
-import { JobsProcessor } from './jobs/jobs.processor';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -28,7 +28,6 @@ import { JobsProcessor } from './jobs/jobs.processor';
       entities: [Job, JobEvent, Certificate, Tenant],
       synchronize: true,
     }),
-    SatModule,
     TenantModule,
     BullModule.forRoot({
       connection: {
@@ -36,8 +35,10 @@ import { JobsProcessor } from './jobs/jobs.processor';
         port: 6379,
       },
     }),
+    SatModule,
+    JobsModule,
   ],
   controllers: [AppController],
-  providers: [AppService, JobsProcessor],
+  providers: [AppService],
 })
 export class AppModule {}

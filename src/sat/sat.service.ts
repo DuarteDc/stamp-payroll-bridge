@@ -52,7 +52,7 @@ export class SatService {
   }
   async consultarEstado(idPaquete: string) {
     const currentPackage = this.packagesMap.get(idPaquete);
-
+    console.log(this.packagesMap);
     if (!currentPackage) {
       return {
         EstadoPaquete: 4, // No encontrado
@@ -61,9 +61,14 @@ export class SatService {
       };
     }
 
-    const job = await this.JobRepository.findOneBy({
-      externalReference: idPaquete,
+    const job = await this.JobRepository.findOne({
+      where: {
+        externalReference: idPaquete,
+      },
+      relations: ['tenant'],
+      // tenant: { id: tenantId }, // Si necesitas buscar por un tenant específico
     });
+    console.log(job);
     await this.JobEventRepository.save({
       job: job!,
       type: JobActions.CONSULTING_PACKAGE,
@@ -78,7 +83,7 @@ export class SatService {
       },
     });
     // Simulación: va cambiando de estado
-    if (currentPackage.status < 3) {
+    if (currentPackage.status < 30) {
       currentPackage.status++;
     }
 
@@ -86,7 +91,7 @@ export class SatService {
       EstadoPaquete: currentPackage.status,
       RespuestaServicio: 'Elemento encontrado',
       BlobUriRespuesta:
-        currentPackage.status === 3 ? currentPackage.response : '',
+        currentPackage.status === 30 ? currentPackage.response : '',
     };
   }
 

@@ -10,19 +10,23 @@ interface PollingQueueData {
 @Processor('polling')
 export class JobsProcessor extends WorkerHost {
   constructor(
-    private readonly satService: SatService,
     @InjectQueue('polling')
     private readonly pollingQueue: Queue<PollingQueueData>,
+    private readonly satService: SatService,
   ) {
     super();
   }
 
   async process(job: Job): Promise<{ success: boolean }> {
     const response = await this.satService.consultarEstado(job.data.packageId);
-    if (response.EstadoPaquete !== 3) {
+    if (response.EstadoPaquete === 30) {
       return { success: true };
     } else {
-      await this.pollingQueue.add('verify-status', job.data, { delay: 1000 });
+      await this.pollingQueue.add('verify-status', job.data, {
+        delay: 30_000,
+        removeOnComplete: true,
+        removeOnFail: true,
+      });
       throw new Error(`Status ${response.EstadoPaquete}, reintento programado`);
     }
   }
