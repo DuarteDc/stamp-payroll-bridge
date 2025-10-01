@@ -13,6 +13,7 @@ import { JobActions } from 'src/common/jobs/constants/job-action.constant';
 import { JobEvent } from './entities';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
+import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
 interface PollingQueueData {
   packageId: string;
   rfc: string;
@@ -32,8 +33,16 @@ export class JobsService {
     private readonly pollingQueue: Queue<PollingQueueData>,
   ) {}
 
-  async createDefaultJob(tenantId: string): Promise<Job> {
-    const tenant = await this.tenantRepository.findOneBy({ id: tenantId });
+  async createDefaultJob(tenantId: string, filePath: string): Promise<Job> {
+    const tenant = await this.tenantRepository.findOne({
+      where: {
+        blobConfig: {
+          status: CommonEntityStatus.TRUE,
+        },
+        id: tenantId,
+      },
+      relations: ['jobConfig'],
+    });
     if (!tenant)
       throw new NotFoundException('El usuario no existe o no es valido');
 
@@ -46,10 +55,7 @@ export class JobsService {
         `Ya existe un job en estado recibido con id ${hastCurrentJob.id}`,
       );
     }
-    const newPackage = await this.satService.sendPackageToSat(
-      tenant.rfc,
-      'https://fake-blob/1234567890.zip',
-    );
+    const newPackage = await this.satService.sendPackageToSat(tenant, filePath);
 
     const job = await this.jobRepository.save({
       tenant: tenant,

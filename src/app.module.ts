@@ -15,9 +15,20 @@ import { Tenant } from './tenant/entities';
 import { BullModule } from '@nestjs/bullmq';
 import { JobsModule } from './jobs/jobs.module';
 import { BlobConfig } from './sat/entities/blob-config.entity';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { join } from 'path';
 
 @Module({
   imports: [
+    MulterModule.register({
+      storage: diskStorage({
+        destination: join(__dirname, '..', 'uploads'),
+        filename: (_req, file, cb) => {
+          cb(null, `${Date.now()}-${file.originalname}`);
+        },
+      }),
+    }),
     StampModule,
     UnzipModule,
     TypeOrmModule.forRoot({

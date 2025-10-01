@@ -21,6 +21,7 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.28.0",
     "@faker-js/faker": "^8.4.1",
     "@nestjs/bull": "^11.0.3",
     "@nestjs/bullmq": "^11.0.3",

@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Job, JobEvent } from 'src/jobs/entities';
 import { Repository } from 'typeorm';
 import { JobActions } from 'src/common/jobs/constants/job-action.constant';
+import { AzureStorageService } from './azure-storage.service';
+import { Tenant } from 'src/tenant/entities';
 
 type Package = {
   status: number;
@@ -24,13 +26,14 @@ export class SatService {
     private readonly JobRepository: Repository<Job>,
     @InjectRepository(JobEvent)
     private readonly JobEventRepository: Repository<JobEvent>,
+    private readonly azureStorageService: AzureStorageService,
   ) {}
 
   async createClient() {
     const client = await soap.createClientAsync(envs.satReceptionWsdl);
     client.setSecurity(
       new soap.WSSecurityCert(
-        fs.readFileSync('duce010817ft5.cer'),
+        Buffer.from(fs.readFileSync('duce010817ft5.cer')).toString('base64'),
         fs.readFileSync('private.key'),
         this.keyPass,
       ),
@@ -38,17 +41,24 @@ export class SatService {
     return client;
   }
 
-  async sendPackageToSat(rfc: string, uriBlob: string) {
+  async sendPackageToSat(tenat: Tenant, filePath: string) {
     console.log(await this.createClient());
+
+    // Call azure funtion to upload file zip
+    await this.azureStorageService.upload(
+      tenat.blobConfig[0].containerId,
+      tenat.blobConfig[0].sas_token,
+      filePath,
+    );
     const idPaquete = 'PKG' + Math.floor(Math.random() * 1000000);
     this.packagesMap.set(idPaquete, {
       status: 1,
-      uriBlob,
+      uriBlob: filePath,
       response: `https://fake-blob/${idPaquete}/resultado.zip`,
     });
     return {
       IdPaquete: idPaquete,
-      Respuesta: `Archivo recibido para RFC ${rfc}`,
+      Respuesta: `Archivo recibido para RFC ${tenat.rfc}`,
       CodRespuesta: 200,
     };
   }
