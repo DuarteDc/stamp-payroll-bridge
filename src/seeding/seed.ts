@@ -3,10 +3,11 @@ import { runSeeders, SeederOptions } from 'typeorm-extension';
 import { envs } from '../config/envs';
 import { MainSeeder } from './main.seeder';
 import { Tenant } from '../tenant/entities';
-import { Certificate } from '../sat/entities';
+import { Certificate, BlobConfig } from '../sat/entities';
 import { Job, JobEvent } from '../jobs/entities';
 import { TenantFactory } from './tenant.factory';
 import { CertificateFactory } from './certificate.factory';
+
 void (async () => {
   const options: DataSourceOptions & SeederOptions = {
     type: 'oracle',
@@ -15,7 +16,7 @@ void (async () => {
     username: envs.dbSchema,
     password: envs.dbPassword,
     //entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    entities: [Tenant, Certificate, Job, JobEvent],
+    entities: [Tenant, Certificate, Job, JobEvent, BlobConfig],
     synchronize: true,
     dropSchema: true,
     seeds: [MainSeeder],

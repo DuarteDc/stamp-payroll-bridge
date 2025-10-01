@@ -46,7 +46,7 @@ export class JobsService {
         `Ya existe un job en estado recibido con id ${hastCurrentJob.id}`,
       );
     }
-    const newPackage = this.satService.sendPackageToSat(
+    const newPackage = await this.satService.sendPackageToSat(
       tenant.rfc,
       'https://fake-blob/1234567890.zip',
     );
@@ -88,6 +88,6 @@ export class JobsService {
       throw new NotFoundException('No existe un job con el id proporcionado');
     }
     console.log(job.externalReference);
-    return this.satService.consultarEstado(job.externalReference);
+    return this.satService.checkStatus(job.externalReference);
   }
 }

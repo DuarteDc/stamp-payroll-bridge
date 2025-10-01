@@ -18,8 +18,8 @@ export class JobsProcessor extends WorkerHost {
   }
 
   async process(job: Job): Promise<{ success: boolean }> {
-    const response = await this.satService.consultarEstado(job.data.packageId);
-    if (response.EstadoPaquete === 30) {
+    const response = await this.satService.checkStatus(job.data.packageId);
+    if (response.EstadoPaquete === 10) {
       return { success: true };
     } else {
       await this.pollingQueue.add('verify-status', job.data, {

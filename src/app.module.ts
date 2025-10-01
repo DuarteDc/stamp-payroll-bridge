@@ -14,6 +14,7 @@ import { Tenant } from './tenant/entities';
 
 import { BullModule } from '@nestjs/bullmq';
 import { JobsModule } from './jobs/jobs.module';
+import { BlobConfig } from './sat/entities/blob-config.entity';
 
 @Module({
   imports: [
@@ -25,7 +26,7 @@ import { JobsModule } from './jobs/jobs.module';
       port: envs.dbPort,
       username: envs.dbSchema,
       password: envs.dbPassword,
-      entities: [Job, JobEvent, Certificate, Tenant],
+      entities: [Job, JobEvent, Certificate, Tenant, BlobConfig],
       synchronize: true,
     }),
     TenantModule,

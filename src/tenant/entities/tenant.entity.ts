@@ -1,11 +1,8 @@
-import { Job } from '../../jobs/entities';
-import { Certificate } from '../../sat/entities';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-export enum Status {
-  TRUE = '1',
-  FALSE = '0',
-}
+import { Job } from '../../jobs/entities';
+import { Certificate, BlobConfig } from '../../sat/entities';
+import { CommonEntityStatus } from '../../common/types/common-entity-status.type';
 
 @Entity({ name: 'TENANTS' })
 export class Tenant {
@@ -18,7 +15,7 @@ export class Tenant {
   @Column({ name: 'RFC' })
   rfc: string;
 
-  @Column({ name: 'STATUS', type: 'char', default: Status.TRUE })
+  @Column({ name: 'STATUS', type: 'char', default: CommonEntityStatus.TRUE })
   status: string;
 
   @Column({
@@ -33,4 +30,7 @@ export class Tenant {
 
   @OneToMany(() => Job, (job) => job.tenant)
   jobs: Job[];
+
+  @OneToMany(() => BlobConfig, (blobConfig) => blobConfig.tenant)
+  blobConfig: BlobConfig[];
 }
