@@ -3,7 +3,7 @@ import { faker } from '@faker-js/faker';
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 
 import { Tenant } from '../tenant/entities';
-import { Certificate } from '../sat/entities';
+import { BlobConfig, Certificate } from '../sat/entities';
 
 export class MainSeeder implements Seeder {
   public async run(
@@ -12,8 +12,8 @@ export class MainSeeder implements Seeder {
   ): Promise<any> {
     const tenantFactory = factoryManager.get(Tenant);
     const tenants = await tenantFactory.saveMany(10);
-
     const certificateFactory = factoryManager.get(Certificate);
+    const blobConfigFactory = factoryManager.get(BlobConfig);
 
     const certificates = await Promise.all(
       Array(10)
@@ -26,7 +26,20 @@ export class MainSeeder implements Seeder {
         }),
     );
 
+    const blobConfig = await Promise.all(
+      Array(10)
+        .fill('')
+        .map(async () => {
+          const blobConfig = await blobConfigFactory.make({
+            tenant: faker.helpers.arrayElement(tenants),
+          });
+          return blobConfig;
+        }),
+    );
+
     const certificateRepo = datasource.getRepository(Certificate);
+    const blobConfigRepo = datasource.getRepository(BlobConfig);
     await certificateRepo.save(certificates);
+    await blobConfigRepo.save(blobConfig);
   }
 }

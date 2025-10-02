@@ -7,6 +7,7 @@ import { Certificate, BlobConfig } from '../sat/entities';
 import { Job, JobEvent } from '../jobs/entities';
 import { TenantFactory } from './tenant.factory';
 import { CertificateFactory } from './certificate.factory';
+import { BlobConfigFactory } from './blob-config.factory';
 
 void (async () => {
   const options: DataSourceOptions & SeederOptions = {
@@ -20,7 +21,7 @@ void (async () => {
     synchronize: true,
     dropSchema: true,
     seeds: [MainSeeder],
-    factories: [TenantFactory, CertificateFactory],
+    factories: [TenantFactory, CertificateFactory, BlobConfigFactory],
   };
 
   const datasource = new DataSource(options);
