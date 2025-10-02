@@ -6,7 +6,7 @@ import { AzureStorageService } from './azure-storage.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Job, JobEvent])],
-  providers: [SatService],
+  providers: [SatService, AzureStorageService],
   exports: [SatService, AzureStorageService],
 })
 export class SatModule {}

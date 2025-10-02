@@ -42,6 +42,7 @@ export class SatService {
   }
 
   async sendPackageToSat(tenat: Tenant, filePath: string) {
+    console.log(tenat);
     console.log(await this.createClient());
 
     // Call azure funtion to upload file zip

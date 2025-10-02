@@ -53,6 +53,9 @@ importers:
       joi:
         specifier: ^18.0.1
         version: 18.0.1
+      multer:
+        specifier: ^2.0.2
+        version: 2.0.2
       oracledb:
         specifier: ^6.9.0
         version: 6.9.0

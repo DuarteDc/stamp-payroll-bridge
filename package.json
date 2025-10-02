@@ -36,6 +36,7 @@
     "bullmq": "^5.58.7",
     "dotenv": "^17.2.1",
     "joi": "^18.0.1",
+    "multer": "^2.0.2",
     "oracledb": "^6.9.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
