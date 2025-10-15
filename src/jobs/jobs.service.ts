@@ -14,6 +14,7 @@ import { JobEvent } from './entities';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
+import { WorkflowLoggerService } from 'src/workflow/workflow-logger.service';
 interface PollingQueueData {
   packageId: string;
   rfc: string;
@@ -31,18 +32,21 @@ export class JobsService {
     private readonly satService: SatService,
     @InjectQueue('polling')
     private readonly pollingQueue: Queue<PollingQueueData>,
+    private readonly logger: WorkflowLoggerService,
   ) {}
 
   async createDefaultJob(tenantId: string, filePath: string): Promise<Job> {
+    this.logger.log(tenantId, 'Creating new job', 'start');
     const tenant = await this.tenantRepository.findOne({
       where: {
-        blobConfig: {
+        blobConfigs: {
           status: CommonEntityStatus.TRUE,
         },
         id: tenantId,
       },
-      relations: ['jobConfig'],
+      relations: ['blobConfigs'],
     });
+
     if (!tenant)
       throw new NotFoundException('El usuario no existe o no es valido');
 
@@ -55,6 +59,8 @@ export class JobsService {
         `Ya existe un job en estado recibido con id ${hastCurrentJob.id}`,
       );
     }
+
+    this.logger.log(tenantId, 'Send new Package', 'pendding');
     const newPackage = await this.satService.sendPackageToSat(tenant, filePath);
 
     const job = await this.jobRepository.save({
@@ -62,8 +68,8 @@ export class JobsService {
       externalReference: newPackage.IdPaquete,
       status: 'RECEIVED',
     });
-
-    await this.jobEventRepository.save({
+    this.logger.log(tenantId, `Job id ${job.id}`, 'pendding');
+    const jobDetail = await this.jobEventRepository.save({
       job: job,
       type: JobActions.SEND_PACKAGE_TO_SAT,
       payload: {
@@ -72,7 +78,11 @@ export class JobsService {
         data: newPackage,
       },
     });
-
+    this.logger.log(
+      tenantId,
+      `new job data  ${JSON.stringify(jobDetail)}`,
+      'pendding',
+    );
     await this.pollingQueue.add(
       'verify-status',
       { packageId: newPackage.IdPaquete, jobId: job.id, rfc: tenant.rfc },
@@ -80,7 +90,7 @@ export class JobsService {
         attempts: 1,
       },
     );
-
+    this.logger.log(tenantId, `Checking status`, 'pendding');
     return job;
   }
 

@@ -7,10 +7,12 @@ import { SatModule } from 'src/sat/sat.module';
 import { JobEvent } from './entities';
 import { BullModule } from '@nestjs/bullmq';
 import { JobsProcessor } from './jobs.processor';
+import { WorkflowModule } from 'src/workflow/workflow.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Job, Tenant, JobEvent]),
+    WorkflowModule,
     SatModule,
     BullModule.registerQueue({
       name: 'polling',

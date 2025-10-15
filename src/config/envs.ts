@@ -15,6 +15,7 @@ interface EnvVars {
   SAT_RECEPTION_WSDL: string;
   SAT_CONSULTATION_WSDL: string;
   SAT_CANCELATION_WSDL: string;
+  JWT_SECRET_KEY: string;
 }
 
 const envVarsSchema = joi
@@ -30,6 +31,7 @@ const envVarsSchema = joi
     SAT_RECEPTION_WSDL: joi.string().uri(),
     SAT_CONSULTATION_WSDL: joi.string().uri(),
     SAT_CANCELATION_WSDL: joi.string().uri(),
+    JWT_SECRET_KEY: joi.string().required(),
   })
   .unknown(true);
 
@@ -53,4 +55,5 @@ export const envs = {
   satReceptionWsdl: envVars.SAT_RECEPTION_WSDL,
   satConsultationWsdl: envVars.SAT_CONSULTATION_WSDL,
   satCancelationWsdl: envVars.SAT_CANCELATION_WSDL,
+  jwtSecretKey: envVars.JWT_SECRET_KEY,
 };

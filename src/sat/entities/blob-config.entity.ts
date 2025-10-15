@@ -24,10 +24,10 @@ export class BlobConfig {
   @Column({ name: 'SAS_TOKEN' })
   sasToken: string;
 
-  @ManyToOne(() => Tenant, (tenant) => tenant.blobConfig)
+  @ManyToOne(() => Tenant, (tenant) => tenant.blobConfigs)
   @JoinColumn({
     name: 'TENANT_ID',
-    foreignKeyConstraintName: 'fk_tenant_blobconfig_id',
+    foreignKeyConstraintName: 'fk_tenant_blobconfig',
   })
   tenant: Tenant;
 

@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { StampModule } from './stamp/stamp.module';
@@ -18,9 +19,15 @@ import { BlobConfig } from './sat/entities/blob-config.entity';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
+import { AuthModule } from './auth/auth.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { WorkflowModule } from './workflow/workflow.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     MulterModule.register({
       storage: diskStorage({
         destination: join(__dirname, '..', 'uploads'),
@@ -41,6 +48,7 @@ import { join } from 'path';
       synchronize: true,
     }),
     TenantModule,
+    EventEmitterModule.forRoot(),
     BullModule.forRoot({
       connection: {
         host: 'localhost',
@@ -49,6 +57,8 @@ import { join } from 'path';
     }),
     SatModule,
     JobsModule,
+    AuthModule,
+    WorkflowModule,
   ],
   controllers: [AppController],
   providers: [AppService],

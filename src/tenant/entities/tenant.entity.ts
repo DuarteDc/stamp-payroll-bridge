@@ -12,6 +12,12 @@ export class Tenant {
   @Column({ name: 'NAME' })
   name: string;
 
+  @Column({ name: 'USERNAME' })
+  username: string;
+
+  @Column({ name: 'PASSWORD' })
+  password: string;
+
   @Column({ name: 'RFC' })
   rfc: string;
 
@@ -32,5 +38,5 @@ export class Tenant {
   jobs: Job[];
 
   @OneToMany(() => BlobConfig, (blobConfig) => blobConfig.tenant)
-  blobConfig: BlobConfig[];
+  blobConfigs: BlobConfig[];
 }

@@ -43,14 +43,14 @@ export class SatService {
 
   async sendPackageToSat(tenat: Tenant, filePath: string) {
     console.log(tenat);
-    console.log(await this.createClient());
+    // console.log(await this.createClient());
 
     // Call azure funtion to upload file zip
-    await this.azureStorageService.upload(
-      tenat.blobConfig[0].containerId,
-      tenat.blobConfig[0].sas_token,
-      filePath,
-    );
+    // await this.azureStorageService.upload(
+    //   tenat.blobConfig[0].containerId,
+    //   tenat.blobConfig[0].sas_token,
+    //   filePath,
+    // );
     const idPaquete = 'PKG' + Math.floor(Math.random() * 1000000);
     this.packagesMap.set(idPaquete, {
       status: 1,
