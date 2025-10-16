@@ -15,7 +15,10 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: ['GET', 'POST', 'HEAD', 'PUT', 'PATCH', 'OPTIONS'],
+  });
   await app.listen(envs.port);
 
   logger.log(`Application is running on port:${envs.port}`);

@@ -19,6 +19,7 @@ interface PollingQueueData {
   packageId: string;
   rfc: string;
   jobId: string;
+  tenantId: string;
 }
 @Injectable()
 export class JobsService {
@@ -36,7 +37,6 @@ export class JobsService {
   ) {}
 
   async createDefaultJob(tenantId: string, filePath: string): Promise<Job> {
-    this.logger.log(tenantId, 'Creating new job', 'start');
     const tenant = await this.tenantRepository.findOne({
       where: {
         blobConfigs: {
@@ -50,6 +50,7 @@ export class JobsService {
     if (!tenant)
       throw new NotFoundException('El usuario no existe o no es valido');
 
+    await this.logger.log(tenantId, 'Creating new job', 'start');
     const hastCurrentJob = await this.jobRepository.findOneBy({
       tenant: { id: tenantId, status: Not(JobStatus.RECEIVED) },
     });
@@ -60,7 +61,7 @@ export class JobsService {
       );
     }
 
-    this.logger.log(tenantId, 'Send new Package', 'pendding');
+    await this.logger.log(tenantId, 'Send new Package', 'pending');
     const newPackage = await this.satService.sendPackageToSat(tenant, filePath);
 
     const job = await this.jobRepository.save({
@@ -68,7 +69,7 @@ export class JobsService {
       externalReference: newPackage.IdPaquete,
       status: 'RECEIVED',
     });
-    this.logger.log(tenantId, `Job id ${job.id}`, 'pendding');
+    await this.logger.log(tenantId, `Job id ${job.id}`, 'pending');
     const jobDetail = await this.jobEventRepository.save({
       job: job,
       type: JobActions.SEND_PACKAGE_TO_SAT,
@@ -78,19 +79,24 @@ export class JobsService {
         data: newPackage,
       },
     });
-    this.logger.log(
+    await this.logger.log(
       tenantId,
       `new job data  ${JSON.stringify(jobDetail)}`,
-      'pendding',
+      'pending',
     );
     await this.pollingQueue.add(
       'verify-status',
-      { packageId: newPackage.IdPaquete, jobId: job.id, rfc: tenant.rfc },
+      {
+        packageId: newPackage.IdPaquete,
+        jobId: job.id,
+        rfc: tenant.rfc,
+        tenantId: tenant.id,
+      },
       {
         attempts: 1,
       },
     );
-    this.logger.log(tenantId, `Checking status`, 'pendding');
+    await this.logger.log(tenantId, `Checking status`, 'pending');
     return job;
   }
 

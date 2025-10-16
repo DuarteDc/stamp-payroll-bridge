@@ -8,6 +8,7 @@ import { Job, JobEvent } from '../jobs/entities';
 import { TenantFactory } from './tenant.factory';
 import { CertificateFactory } from './certificate.factory';
 import { BlobConfigFactory } from './blob-config.factory';
+import { WorkflowLog } from '../workflow/entities/workflow-log.entity';
 
 void (async () => {
   const options: DataSourceOptions & SeederOptions = {
@@ -17,7 +18,7 @@ void (async () => {
     username: envs.dbSchema,
     password: envs.dbPassword,
     //entities: [__dirname + '/**/*.entity{.ts,.js}'],
-    entities: [Tenant, Certificate, Job, JobEvent, BlobConfig],
+    entities: [Tenant, Certificate, Job, JobEvent, BlobConfig, WorkflowLog],
     synchronize: true,
     dropSchema: true,
     seeds: [MainSeeder],

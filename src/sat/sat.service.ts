@@ -42,7 +42,6 @@ export class SatService {
   }
 
   async sendPackageToSat(tenat: Tenant, filePath: string) {
-    console.log(tenat);
     // console.log(await this.createClient());
 
     // Call azure funtion to upload file zip
@@ -95,7 +94,7 @@ export class SatService {
       },
     });
     // Simulación: va cambiando de estado
-    if (currentPackage.status < 10) {
+    if (currentPackage.status < 30) {
       currentPackage.status++;
     }
 
@@ -103,7 +102,7 @@ export class SatService {
       EstadoPaquete: currentPackage.status,
       RespuestaServicio: 'Elemento encontrado',
       BlobUriRespuesta:
-        currentPackage.status === 10 ? currentPackage.response : '',
+        currentPackage.status === 30 ? currentPackage.response : '',
     };
   }
 

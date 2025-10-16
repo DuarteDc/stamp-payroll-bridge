@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HashService } from './hash.service';
 import { TenantService } from 'src/tenant/tenant.service';
@@ -19,15 +20,17 @@ export class AuthService {
     if (!tenant || !this.hashService.verifyPassword(password, tenant.password))
       throw new BadRequestException('Username or password are not valid');
 
+    const { password: __, ...tenantWithoutPassword } = tenant;
     return {
-      ...tenant,
+      ...tenantWithoutPassword,
       accessToken: await this.tokenService.sign({ id: tenant.id }),
     };
   }
 
   async checkAuthentication(tenant: Tenant) {
+    const { password: __, ...tenantWithoutPassword } = tenant;
     return {
-      ...tenant,
+      ...tenantWithoutPassword,
       accessToken: await this.tokenService.sign({ id: tenant.id }),
     };
   }

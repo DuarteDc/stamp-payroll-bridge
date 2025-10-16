@@ -22,9 +22,11 @@ import { join } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WorkflowModule } from './workflow/workflow.module';
+import { WorkflowLog } from './workflow/entities/workflow-log.entity';
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -44,21 +46,20 @@ import { WorkflowModule } from './workflow/workflow.module';
       port: envs.dbPort,
       username: envs.dbSchema,
       password: envs.dbPassword,
-      entities: [Job, JobEvent, Certificate, Tenant, BlobConfig],
+      entities: [Job, JobEvent, Certificate, Tenant, BlobConfig, WorkflowLog],
       synchronize: true,
     }),
     TenantModule,
-    EventEmitterModule.forRoot(),
     BullModule.forRoot({
       connection: {
         host: 'localhost',
         port: 6379,
       },
     }),
+    WorkflowModule,
     SatModule,
     JobsModule,
     AuthModule,
-    WorkflowModule,
   ],
   controllers: [AppController],
   providers: [AppService],
