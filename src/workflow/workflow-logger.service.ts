@@ -4,7 +4,8 @@ import { Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { WorkflowLog } from './entities/workflow-log.entity';
 import { Tenant } from 'src/tenant/entities';
-import { Job } from 'src/jobs/entities/job.entity';
+import { Job, JobStatus } from 'src/jobs/entities/job.entity';
+import { interval, map } from 'rxjs';
 
 @Injectable()
 export class WorkflowLoggerService {
@@ -12,6 +13,8 @@ export class WorkflowLoggerService {
     private readonly eventEmitter: EventEmitter2,
     @InjectRepository(WorkflowLog)
     private readonly logRepository: Repository<WorkflowLog>,
+    @InjectRepository(WorkflowLog)
+    private readonly jobRepository: Repository<Job>,
   ) {}
 
   async log(
@@ -29,7 +32,7 @@ export class WorkflowLoggerService {
 
     await this.logRepository.save(log);
 
-    this.eventEmitter.emit(`workflow.${tenantId}`, log);
+    this.eventEmitter.emit(`workflow.${jobId}`, log);
 
     return log;
   }
@@ -41,10 +44,26 @@ export class WorkflowLoggerService {
     });
   }
 
-  async getLogsByTenant(tenantId: string) {
-    return this.logRepository.find({
-      where: { tenant: { id: tenantId } },
+  async getLogsByTenant(tenantId: string, jobId: string) {
+    return await this.logRepository.find({
+      where: {
+        tenant: { id: tenantId },
+        job: {
+          id: jobId,
+        },
+      },
       order: { timestamp: 'ASC' },
     });
+  }
+
+  async getWorkflowStatusSteam(tenantId: string) {
+    const getActivePayrollProcess = await this.jobRepository.find({
+      where: {
+        tenant: { id: tenantId },
+        status: JobStatus.RECEIVED,
+      },
+    });
+    console.log(getActivePayrollProcess);
+    return getActivePayrollProcess;
   }
 }

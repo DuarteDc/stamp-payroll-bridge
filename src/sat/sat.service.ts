@@ -64,7 +64,7 @@ export class SatService {
   }
   async checkStatus(idPaquete: string) {
     const currentPackage = this.packagesMap.get(idPaquete);
-    console.log(this.packagesMap);
+
     if (!currentPackage) {
       return {
         EstadoPaquete: 4, // No encontrado

@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { JobEvent } from './job-event.entity';
 import { Tenant } from '../../tenant/entities';
+import { WorkflowLog } from '../../workflow/entities/workflow-log.entity';
 
 export enum JobStatus {
   RECEIVED = 'RECEIVED',
@@ -22,7 +23,7 @@ export class Job {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
   id: string;
 
-  @Column({ name: 'EXTERNAL_REFERENCE' })
+  @Column({ name: 'EXTERNAL_REFERENCE', nullable: true })
   externalReference: string;
 
   @Column({
@@ -41,6 +42,9 @@ export class Job {
 
   @OneToMany(() => JobEvent, (jobEvent) => jobEvent.job, { cascade: false })
   jobEvents: JobEvent[];
+
+  @OneToMany(() => WorkflowLog, (workflow) => workflow.job, { cascade: false })
+  workflows: WorkflowLog[];
 
   @ManyToOne(() => Tenant, (tenant) => tenant.jobs, { cascade: false })
   @JoinColumn({

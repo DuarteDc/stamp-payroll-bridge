@@ -8,9 +8,15 @@ import { JobEvent } from './entities';
 import { BullModule } from '@nestjs/bullmq';
 import { JobsProcessor } from './jobs.processor';
 import { WorkflowModule } from 'src/workflow/workflow.module';
+import { JobsController } from './jobs.controller';
+import { AuthModule } from 'src/auth/auth.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
+  controllers: [JobsController],
   imports: [
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    AuthModule,
     TypeOrmModule.forFeature([Job, Tenant, JobEvent]),
     WorkflowModule,
     SatModule,

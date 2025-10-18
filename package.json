@@ -44,6 +44,7 @@
     "dotenv": "^17.2.1",
     "joi": "^18.0.1",
     "multer": "^2.0.2",
+    "nestjs-paginate": "^12.8.3",
     "oracledb": "^6.9.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",

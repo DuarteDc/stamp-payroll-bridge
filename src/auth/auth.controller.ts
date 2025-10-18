@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { LoginTenantDto } from './dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -19,5 +19,10 @@ export class AuthController {
   @UseGuards(AuthGuard())
   refreshToken(@GetTenant() tenant: Tenant) {
     return this.authService.checkAuthentication(tenant);
+  }
+
+  @Put(':id')
+  updateTenantProfile() {
+    return 'xd';
   }
 }

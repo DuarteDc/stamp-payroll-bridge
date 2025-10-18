@@ -1,13 +1,9 @@
-import { Not, Repository } from 'typeorm';
-import { Job, JobStatus } from './entities/job.entity';
+import { Repository } from 'typeorm';
+import { Job } from './entities/job.entity';
 import { Tenant } from 'src/tenant/entities';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { SatService } from 'src/sat/sat.service';
 import { JobActions } from 'src/common/jobs/constants/job-action.constant';
 import { JobEvent } from './entities';
@@ -15,6 +11,7 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
 import { WorkflowLoggerService } from 'src/workflow/workflow-logger.service';
+import { paginate, PaginateQuery } from 'nestjs-paginate';
 interface PollingQueueData {
   packageId: string;
   rfc: string;
@@ -50,27 +47,49 @@ export class JobsService {
     if (!tenant)
       throw new NotFoundException('El usuario no existe o no es valido');
 
-    await this.logger.log(tenantId, 'Creating new job', 'start');
-    const hastCurrentJob = await this.jobRepository.findOneBy({
-      tenant: { id: tenantId, status: Not(JobStatus.RECEIVED) },
-    });
+    // const hastCurrentJob = await this.jobRepository.findOneBy({
+    //   tenant: { id: tenantId, status: Not(JobStatus.TIMBRADO) },
+    // });
 
-    if (hastCurrentJob) {
-      throw new BadRequestException(
-        `Ya existe un job en estado recibido con id ${hastCurrentJob.id}`,
-      );
-    }
+    // if (hastCurrentJob) {
+    //   throw new BadRequestException(
+    //     `Ya existe un job en estado recibido con id ${hastCurrentJob.id}`,
+    //   );
+    // }
 
-    await this.logger.log(tenantId, 'Send new Package', 'pending');
-    const newPackage = await this.satService.sendPackageToSat(tenant, filePath);
-
-    const job = await this.jobRepository.save({
+    let job = await this.jobRepository.save({
       tenant: tenant,
-      externalReference: newPackage.IdPaquete,
       status: 'RECEIVED',
     });
-    await this.logger.log(tenantId, `Job id ${job.id}`, 'pending');
-    const jobDetail = await this.jobEventRepository.save({
+    await this.logger.log(
+      tenantId,
+      `Iniciando proceso de timbrado de nomina, por el usuario: ${tenant.name} - ${tenant.rfc}`,
+      'start',
+      job.id,
+    );
+    await this.logger.log(
+      tenantId,
+      `Enviando el paquete al SAT`,
+      'start',
+      job.id,
+    );
+    const newPackage = await this.satService.sendPackageToSat(tenant, filePath);
+    await this.logger.log(
+      tenantId,
+      `EL paquete se envío al sat con el identificador ${newPackage.IdPaquete}`,
+      'pending',
+      job.id,
+    );
+
+    job.externalReference = newPackage.IdPaquete;
+    job = await this.jobRepository.save(job);
+    await this.logger.log(
+      tenantId,
+      `Identificador del ${job.id}`,
+      'pending',
+      job.id,
+    );
+    await this.jobEventRepository.save({
       job: job,
       type: JobActions.SEND_PACKAGE_TO_SAT,
       payload: {
@@ -81,8 +100,9 @@ export class JobsService {
     });
     await this.logger.log(
       tenantId,
-      `new job data  ${JSON.stringify(jobDetail)}`,
+      `El proceso se asigno correctamente al usuario ${tenant.name} y al paquete ${newPackage.IdPaquete}`,
       'pending',
+      job.id,
     );
     await this.pollingQueue.add(
       'verify-status',
@@ -96,7 +116,6 @@ export class JobsService {
         attempts: 1,
       },
     );
-    await this.logger.log(tenantId, `Checking status`, 'pending');
     return job;
   }
 
@@ -109,7 +128,35 @@ export class JobsService {
     if (!job) {
       throw new NotFoundException('No existe un job con el id proporcionado');
     }
-    console.log(job.externalReference);
     return this.satService.checkStatus(job.externalReference);
+  }
+
+  async findJobsByTenant(query: PaginateQuery, tenantId: string) {
+    return paginate(query, this.jobRepository, {
+      sortableColumns: ['id', 'createdAt', 'externalReference'],
+      nullSort: 'last',
+      defaultSortBy: [['createdAt', 'DESC']],
+      where: {
+        tenant: {
+          id: tenantId,
+        },
+      },
+      defaultLimit: 10,
+    });
+  }
+
+  async findJobDetail(jobId: string) {
+    const job = await this.jobRepository.findOne({
+      where: {
+        id: jobId,
+      },
+      relations: {
+        workflows: true,
+      },
+    });
+    if (!job) {
+      throw new NotFoundException('No existe un job con el id proporcionado');
+    }
+    return job;
   }
 }
