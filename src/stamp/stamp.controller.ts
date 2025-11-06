@@ -12,20 +12,20 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { JobsService } from 'src/jobs/jobs.service';
 
 interface Parmas {
-  id: string;
+  rfc: string;
 }
 @Controller('stamp')
 export class StampController {
   constructor(private readonly jobsService: JobsService) {}
 
-  @Post('upload/:id')
+  @Post('upload/:rfc')
   @UseInterceptors(FileInterceptor('file'))
   @HttpCode(202)
   async create(
     @UploadedFile() file: Express.Multer.File,
     @Param() params: Parmas,
   ) {
-    const job = await this.jobsService.createDefaultJob(params.id, file.path);
+    const job = await this.jobsService.createDefaultJob(params.rfc, file.path);
     return {
       message: `Processing started with ID: ${job.id}`,
     };
