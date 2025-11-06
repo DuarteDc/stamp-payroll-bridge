@@ -1,11 +1,27 @@
+version: "3.9"
+
 services:
+  redis:
+    image: redis:alpine3.22
+    container_name: redis
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   db:
     image: gvenzl/oracle-xe
+    container_name: oracle-xe
     ports:
       - 1521:1521
-      # - 5000:500
-    container_name: oracle-xe
     restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
     environment:
       - ORACLE_DATABASE=STAMP
       - ORACLE_PASSWORD=password123.
@@ -13,9 +29,26 @@ services:
       - APP_USER_PASSWORD=password123.
     volumes:
       - ./data:/u01/app/oracle/oradata/XE
-  redis:
-    image: redis:alpine3.22
-    container_name: redis
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo 'SELECT 1 FROM dual;' | sqlplus -s userd/password123.@//localhost:1521/xe || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 40s
+
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    container_name: stamp-payroll-bridge-dev
+    env_file:
+      - .env
     ports:
-      - 6379:6379
-    restart: unless-stopped
+      - 5000:3000
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["pnpm", "run", "start:dev"]

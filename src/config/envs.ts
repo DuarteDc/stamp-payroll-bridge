@@ -17,6 +17,8 @@ interface EnvVars {
   SAT_CANCELATION_WSDL: string;
   JWT_SECRET_KEY: string;
   JWT_EXPIRATION_TIME: string;
+  REDIS_HOST: string;
+  REDIS_PORT: number;
 }
 
 const envVarsSchema = joi
@@ -34,6 +36,8 @@ const envVarsSchema = joi
     SAT_CANCELATION_WSDL: joi.string().uri(),
     JWT_SECRET_KEY: joi.string().required(),
     JWT_EXPIRATION_TIME: joi.string().required(),
+    REDIS_HOST: joi.string().default('redis'),
+    REDIS_PORT: joi.number().default(6379),
   })
   .unknown(true);
 
@@ -59,4 +63,6 @@ export const envs = {
   satCancelationWsdl: envVars.SAT_CANCELATION_WSDL,
   jwtSecretKey: envVars.JWT_SECRET_KEY,
   jwtExpirationTime: envVars.JWT_EXPIRATION_TIME,
+  redisHost: envVars.REDIS_HOST,
+  redisPort: envVars.REDIS_PORT,
 };

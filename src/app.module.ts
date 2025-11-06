@@ -54,8 +54,8 @@ import { WorkflowLog } from './workflow/entities/workflow-log.entity';
     TenantModule,
     BullModule.forRoot({
       connection: {
-        host: 'localhost',
-        port: 6379,
+        host: envs.redisHost,
+        port: envs.redisPort,
       },
     }),
     WorkflowModule,
