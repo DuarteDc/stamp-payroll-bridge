@@ -1,15 +1,18 @@
 services:
   db:
-    image: gvenzl/oracle-xe
+    image: gvenzl/oracle-xe:latest-faststart
     ports:
       - 1521:1521
-      - 5000:500
+      # - 5000:500
     container_name: oracle-xe
     restart: unless-stopped
     environment:
-      - ORACLE_PASSWORD=MiPasswordSeguro
+      - ORACLE_DATABASE=${DB_SID}
+      - ORACLE_PASSWORD=${DB_PASSWORD}
+      - APP_USER=${DB_USERNAME}
+      - APP_USER_PASSWORD=${DB_PASSWORD}
     volumes:
-      - ./data:/opt/oracle/oradata
+      - ./data:/u01/app/oracle/oradata/XE
   redis:
     image: redis:alpine3.22
     container_name: redis
