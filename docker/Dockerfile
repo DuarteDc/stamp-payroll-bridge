@@ -23,4 +23,4 @@ RUN pnpm run build
 EXPOSE 3000
 
 # Comando por defecto
-CMD ["node", "dist/main"]
+CMD ["node", "dist/main.js"]
