@@ -11,16 +11,13 @@ WORKDIR /usr/src/app
 COPY package.json pnpm-lock.yaml ./
 
 # Instala las dependencias
-RUN pnpm install --frozen-lockfile
+RUN pnpm install
 
 # Copia el resto del código fuente
 COPY . .
 
-# Construye la aplicación
-RUN pnpm run build
-
 # Expone el puerto
 EXPOSE 3000
 
-# Comando por defecto
-CMD ["node", "dist/main.js"]
+# Comando por defecto: modo desarrollo
+CMD ["pnpm", "run", "start:dev"]
