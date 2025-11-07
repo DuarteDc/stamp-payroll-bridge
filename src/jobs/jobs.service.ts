@@ -62,20 +62,20 @@ export class JobsService {
       status: 'RECEIVED',
     });
     await this.logger.log(
-      tenant.rfc,
+      tenant.id,
       `Iniciando proceso de timbrado de nomina, por el usuario: ${tenant.name} - ${tenant.rfc}`,
       'start',
       job.id,
     );
     await this.logger.log(
-      tenant.rfc,
+      tenant.id,
       `Enviando el paquete al SAT`,
       'start',
       job.id,
     );
     const newPackage = await this.satService.sendPackageToSat(tenant, filePath);
     await this.logger.log(
-      tenant.rfc,
+      tenant.id,
       `EL paquete se envío al sat con el identificador ${newPackage.IdPaquete}`,
       'pending',
       job.id,
@@ -84,7 +84,7 @@ export class JobsService {
     job.externalReference = newPackage.IdPaquete;
     job = await this.jobRepository.save(job);
     await this.logger.log(
-      tenant.rfc,
+      tenant.id,
       `Identificador del ${job.id}`,
       'pending',
       job.id,
@@ -99,7 +99,7 @@ export class JobsService {
       },
     });
     await this.logger.log(
-      tenantRfc,
+      tenant.id,
       `El proceso se asigno correctamente al usuario ${tenant.name} y al paquete ${newPackage.IdPaquete}`,
       'pending',
       job.id,
