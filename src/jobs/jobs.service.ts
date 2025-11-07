@@ -47,16 +47,6 @@ export class JobsService {
     if (!tenant)
       throw new NotFoundException('El usuario no existe o no es valido');
 
-    // const hastCurrentJob = await this.jobRepository.findOneBy({
-    //   tenant: { id: tenantId, status: Not(JobStatus.TIMBRADO) },
-    // });
-
-    // if (hastCurrentJob) {
-    //   throw new BadRequestException(
-    //     `Ya existe un job en estado recibido con id ${hastCurrentJob.id}`,
-    //   );
-    // }
-
     let job = await this.jobRepository.save({
       tenant: tenant,
       status: 'RECEIVED',
