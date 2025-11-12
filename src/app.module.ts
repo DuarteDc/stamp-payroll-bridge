@@ -23,6 +23,8 @@ import { AuthModule } from './auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WorkflowModule } from './workflow/workflow.module';
 import { WorkflowLog } from './workflow/entities/workflow-log.entity';
+import { DependencyModule } from './dependency/dependency.module';
+import { Dependency } from './dependency/entities/dependency.entity';
 
 @Module({
   imports: [
@@ -48,7 +50,15 @@ import { WorkflowLog } from './workflow/entities/workflow-log.entity';
       schema: envs.dbSchema,
       serviceName: envs.dbSid,
       password: envs.dbPassword,
-      entities: [Job, JobEvent, Certificate, Tenant, BlobConfig, WorkflowLog],
+      entities: [
+        Job,
+        JobEvent,
+        Certificate,
+        Tenant,
+        BlobConfig,
+        WorkflowLog,
+        Dependency,
+      ],
       synchronize: true,
     }),
     TenantModule,
@@ -62,6 +72,7 @@ import { WorkflowLog } from './workflow/entities/workflow-log.entity';
     SatModule,
     JobsModule,
     AuthModule,
+    DependencyModule,
   ],
   controllers: [AppController],
   providers: [AppService],
