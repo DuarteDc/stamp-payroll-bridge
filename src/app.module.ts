@@ -25,6 +25,7 @@ import { WorkflowModule } from './workflow/workflow.module';
 import { WorkflowLog } from './workflow/entities/workflow-log.entity';
 import { DependencyModule } from './dependency/dependency.module';
 import { Dependency } from './dependency/entities/dependency.entity';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { Dependency } from './dependency/entities/dependency.entity';
     JobsModule,
     AuthModule,
     DependencyModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,16 +1,9 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToMany,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Job } from '../../jobs/entities';
 import { Certificate, BlobConfig } from '../../sat/entities';
 import { CommonEntityStatus } from '../../common/types/common-entity-status.type';
-import { Dependency } from 'src/dependency/entities/dependency.entity';
+import { User } from 'src/users/entities/user.entity';
 
 @Entity({ name: 'TENANTS' })
 export class Tenant {
@@ -20,11 +13,11 @@ export class Tenant {
   @Column({ name: 'NAME' })
   name: string;
 
-  @Column({ name: 'USERNAME' })
-  username: string;
+  @Column({ name: 'ABBREVIATION' })
+  abbreviation: string;
 
-  @Column({ name: 'PASSWORD' })
-  password: string;
+  @Column({ name: 'RFC' })
+  rfc: string;
 
   @Column({ name: 'STATUS', type: 'char', default: CommonEntityStatus.TRUE })
   status: string;
@@ -36,12 +29,8 @@ export class Tenant {
   })
   createdAt: Date;
 
-  @ManyToOne(() => Dependency, (dependency) => dependency.tenants)
-  @JoinColumn({
-    name: 'DEPENDENCY_ID',
-    foreignKeyConstraintName: 'fk_dependency_tenant',
-  })
-  dependency: Dependency;
+  @OneToMany(() => User, (user) => user.tenant)
+  users: User[];
 
   @OneToMany(() => Certificate, (certificate) => certificate.tenant)
   certificates: Certificate[];
