@@ -1,36 +1,36 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { HashService } from './hash.service';
-import { TenantService } from 'src/tenant/tenant.service';
 
 import { LoginTenantDto } from './dto';
 import { TokenService } from './token.service';
-import { Tenant } from 'src/tenant/entities';
+import { UserService } from 'src/users/user.service';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly tenantService: TenantService,
+    private readonly userService: UserService,
     private readonly hashService: HashService,
     private readonly tokenService: TokenService,
   ) {}
 
   async signIn({ username, password }: LoginTenantDto) {
-    const tenant = await this.tenantService.findByUsername(username);
-    if (!tenant || !this.hashService.verifyPassword(password, tenant.password))
+    const user = await this.userService.findByUsername(username);
+    if (!user || !this.hashService.verifyPassword(password, user.password))
       throw new BadRequestException('El usuario o contraseña no son validos');
 
-    const { password: __, ...tenantWithoutPassword } = tenant;
+    const { password: __, ...tenantWithoutPassword } = user;
     return {
       ...tenantWithoutPassword,
-      accessToken: await this.tokenService.sign({ id: tenant.id }),
+      accessToken: await this.tokenService.sign({ id: user.id }),
     };
   }
 
-  async checkAuthentication(tenant: Tenant) {
-    const { password: __, ...tenantWithoutPassword } = tenant;
+  async checkAuthentication(user: User) {
+    const { password: __, ...tenantWithoutPassword } = user;
     return {
       ...tenantWithoutPassword,
-      accessToken: await this.tokenService.sign({ id: tenant.id }),
+      accessToken: await this.tokenService.sign({ id: user.id }),
     };
   }
 }

@@ -2,15 +2,15 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-import { TenantService } from 'src/tenant/tenant.service';
 
 import type { JWTPayload } from '../interfaces/jwt-payload.interface';
-import { Tenant } from 'src/tenant/entities';
 import { ConfigService } from '@nestjs/config';
+import { UserService } from 'src/users/user.service';
+import { User } from 'src/users/entities/user.entity';
 @Injectable()
 export class JWTStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly tenantService: TenantService,
+    private readonly userService: UserService,
     configService: ConfigService,
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
@@ -22,9 +22,9 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate({ id }: JWTPayload): Promise<Tenant> {
-    const tenant = await this.tenantService.findOne(id);
-    if (!tenant) throw new UnauthorizedException('Invalid access token');
-    return tenant;
+  async validate({ id }: JWTPayload): Promise<User> {
+    const user = await this.userService.findOne(id);
+    if (!user) throw new UnauthorizedException('Invalid access token');
+    return user;
   }
 }

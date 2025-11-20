@@ -1,4 +1,4 @@
-import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
+import { CommonEntityStatus } from '../../common/types/common-entity-status.type';
 import { Tenant } from '../../tenant/entities/tenant.entity';
 import {
   Column,

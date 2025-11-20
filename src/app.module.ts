@@ -23,9 +23,8 @@ import { AuthModule } from './auth/auth.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { WorkflowModule } from './workflow/workflow.module';
 import { WorkflowLog } from './workflow/entities/workflow-log.entity';
-import { DependencyModule } from './dependency/dependency.module';
-import { Dependency } from './dependency/entities/dependency.entity';
 import { UsersModule } from './users/users.module';
+import { User } from './users/entities/user.entity';
 
 @Module({
   imports: [
@@ -58,7 +57,7 @@ import { UsersModule } from './users/users.module';
         Tenant,
         BlobConfig,
         WorkflowLog,
-        Dependency,
+        User,
       ],
       synchronize: true,
     }),
@@ -72,9 +71,8 @@ import { UsersModule } from './users/users.module';
     WorkflowModule,
     SatModule,
     JobsModule,
-    AuthModule,
-    DependencyModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

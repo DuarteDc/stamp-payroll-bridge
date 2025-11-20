@@ -4,16 +4,33 @@ import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 
 import { Tenant } from '../tenant/entities';
 import { BlobConfig, Certificate } from '../sat/entities';
+import { TenantFactory } from './tenant.factory';
+import { User } from '../users/entities/user.entity';
 
 export class MainSeeder implements Seeder {
   public async run(
     datasource: DataSource,
     factoryManager: SeederFactoryManager,
   ): Promise<any> {
-    const tenantFactory = factoryManager.get(Tenant);
-    const tenants = await tenantFactory.saveMany(10);
+    const newTenants = TenantFactory();
+    const tenantRepo = datasource.getRepository(Tenant);
+    const tenants = await tenantRepo.save(newTenants);
+
+    const userFactory = factoryManager.get(User);
+
     const certificateFactory = factoryManager.get(Certificate);
     const blobConfigFactory = factoryManager.get(BlobConfig);
+
+    const users = await Promise.all(
+      Array(10)
+        .fill('')
+        .map(async () => {
+          const user = await userFactory.make({
+            tenant: faker.helpers.arrayElement(tenants),
+          });
+          return user;
+        }),
+    );
 
     const certificates = await Promise.all(
       Array(10)
@@ -39,7 +56,11 @@ export class MainSeeder implements Seeder {
 
     const certificateRepo = datasource.getRepository(Certificate);
     const blobConfigRepo = datasource.getRepository(BlobConfig);
-    await certificateRepo.save(certificates);
-    await blobConfigRepo.save(blobConfig);
+    const userConfigRepo = datasource.getRepository(User);
+    await Promise.all([
+      await userConfigRepo.save(users),
+      await certificateRepo.save(certificates),
+      await blobConfigRepo.save(blobConfig),
+    ]);
   }
 }

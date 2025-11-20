@@ -3,8 +3,8 @@ import { Observable } from 'rxjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { WorkflowLoggerService } from './workflow-logger.service';
 import { AuthGuard } from '@nestjs/passport';
-import { Tenant as GetTenant } from '../auth/decorators/tenant.decorator';
-import { Tenant } from 'src/tenant/entities';
+import { User as GetUser } from '../auth/decorators/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 @Controller('workflow')
 @UseGuards(AuthGuard())
 export class WorkflowController {
@@ -16,11 +16,11 @@ export class WorkflowController {
   @Sse(':jobId')
   stream(
     @Param('jobId') jobId: string,
-    @GetTenant() tenant: Tenant,
+    @GetUser() user: User,
   ): Observable<MessageEvent> {
     return new Observable((observer) => {
       this.workflowLoggerService
-        .getLogsByTenant(tenant.id, jobId)
+        .getLogsByTenant(user.id, jobId)
         .then((previousLogs) => {
           for (const log of previousLogs) {
             observer.next(
@@ -53,10 +53,10 @@ export class WorkflowController {
   }
 
   @Sse('status')
-  sendActiveProcess(@GetTenant() tenant: Tenant) {
+  sendActiveProcess(@GetUser() user: User) {
     return new Observable((observer) => {
       this.workflowLoggerService
-        .getWorkflowStatusSteam(tenant.id)
+        .getWorkflowStatusSteam(user.id)
         .then(() => {
           observer.next(
             new MessageEvent('xd', {

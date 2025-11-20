@@ -1,15 +1,15 @@
+import { DEFAUTL_TENANTS } from '../tenant/constants/default-tenants.constants';
 import { Tenant } from '../tenant/entities';
-import { setSeederFactory } from 'typeorm-extension';
-export const TenantFactory = setSeederFactory(Tenant, (faker) => {
-  const tenant = new Tenant();
-  tenant.rfc = faker.helpers.arrayElement([
-    'SSP190501626',
-    'SGO1301036U0A',
-    'SPF130103BF7',
-  ]);
-  tenant.name = faker.person.fullName();
+export const TenantFactory = () => {
+  const newTenants: Tenant[] = [];
 
-  tenant.status = '1';
-
-  return tenant;
-});
+  for (const tenant of DEFAUTL_TENANTS) {
+    const newTenant = new Tenant();
+    newTenant.name = tenant.name;
+    newTenant.abbreviation = tenant.abbreviation;
+    newTenant.rfc = tenant.rfc;
+    newTenant.status = '1';
+    newTenants.push(newTenant);
+  }
+  return newTenants;
+};

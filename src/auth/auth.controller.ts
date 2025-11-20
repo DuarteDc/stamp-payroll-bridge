@@ -3,8 +3,8 @@ import { LoginTenantDto } from './dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 
-import { Tenant as GetTenant } from './decorators/tenant.decorator';
-import { Tenant } from 'src/tenant/entities';
+import { User as GetUser } from './decorators/user.decorator';
+import { User } from 'src/users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -17,8 +17,8 @@ export class AuthController {
 
   @Get('refresh')
   @UseGuards(AuthGuard())
-  refreshToken(@GetTenant() tenant: Tenant) {
-    return this.authService.checkAuthentication(tenant);
+  refreshToken(@GetUser() user: User) {
+    return this.authService.checkAuthentication(user);
   }
 
   @Put(':id')

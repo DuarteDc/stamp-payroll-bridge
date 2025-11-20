@@ -3,7 +3,7 @@ import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Job } from '../../jobs/entities';
 import { Certificate, BlobConfig } from '../../sat/entities';
 import { CommonEntityStatus } from '../../common/types/common-entity-status.type';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({ name: 'TENANTS' })
 export class Tenant {
