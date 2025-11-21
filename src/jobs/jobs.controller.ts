@@ -1,7 +1,8 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
-import { JobsService } from './jobs.service';
-import { Paginate, Paginated, type PaginateQuery } from 'nestjs-paginate';
 import { AuthGuard } from '@nestjs/passport';
+import { Paginate, Paginated, type PaginateQuery } from 'nestjs-paginate';
+
+import { JobsService } from './jobs.service';
 import { User as GetUser } from '../auth/decorators/user.decorator';
 import { Job } from './entities';
 import { User } from 'src/users/entities/user.entity';

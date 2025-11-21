@@ -1,11 +1,13 @@
 import { hashSync } from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 import { setSeederFactory } from 'typeorm-extension';
+import { UserRole } from '../auth/interfaces/user-role.interface';
 
 export const UserFactory = setSeederFactory(User, (faker) => {
   const user = new User();
   user.name = faker.person.firstName();
   user.username = faker.internet.userName();
+  user.role = faker.helpers.arrayElement([UserRole.ADMIN, UserRole.USER]);
   user.password = hashSync('password', 10);
   user.status = '1';
 

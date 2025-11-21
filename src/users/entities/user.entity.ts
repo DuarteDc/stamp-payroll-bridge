@@ -25,6 +25,9 @@ export class User {
   @Column({ name: 'STATUS', type: 'char', default: CommonEntityStatus.TRUE })
   status: string;
 
+  @Column({ name: 'ROLE' })
+  role: string;
+
   @ManyToOne(() => Tenant, (tenant) => tenant.users)
   @JoinColumn({
     name: 'TENANT_ID',
