@@ -22,6 +22,14 @@ export class TenantService {
     }
   }
 
+  async findAll() {
+    try {
+      return await this.tenantRepository.find({ where: { status: '1' } });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
   private handleError(error: any) {
     console.log(error);
     if (error instanceof HttpException) throw error;

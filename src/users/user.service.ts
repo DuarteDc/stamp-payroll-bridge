@@ -52,9 +52,11 @@ export class UserService {
   }
 
   async findAllUsers(query: PaginateQuery) {
+    console.log(query);
     return paginate(query, this.userRepository, {
       sortableColumns: ['name', 'id', 'status'],
       nullSort: 'first',
+      searchableColumns: ['name', 'username', 'role'],
       defaultSortBy: [['id', 'DESC']],
       defaultLimit: 10,
       select: [
