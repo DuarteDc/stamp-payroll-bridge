@@ -25,6 +25,8 @@ import { WorkflowModule } from './workflow/workflow.module';
 import { WorkflowLog } from './workflow/entities/workflow-log.entity';
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
+import { AuditModule } from './audit/audit.module';
+import { AuditLog } from './audit/entities/audit-log.entity';
 
 @Module({
   imports: [
@@ -58,6 +60,7 @@ import { User } from './users/entities/user.entity';
         BlobConfig,
         WorkflowLog,
         User,
+        AuditLog,
       ],
       synchronize: true,
     }),
@@ -73,6 +76,7 @@ import { User } from './users/entities/user.entity';
     JobsModule,
     UsersModule,
     AuthModule,
+    AuditModule,
   ],
   controllers: [AppController],
   providers: [AppService],

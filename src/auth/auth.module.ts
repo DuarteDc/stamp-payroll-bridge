@@ -31,6 +31,6 @@ import { UsersModule } from 'src/users/users.module';
   ],
   controllers: [AuthController],
   providers: [AuthService, HashService, JWTStrategy, TokenService],
-  exports: [AuthService],
+  exports: [AuthService, JWTStrategy, TokenService],
 })
 export class AuthModule {}

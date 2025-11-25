@@ -7,12 +7,15 @@ import { paginate, PaginateQuery } from 'nestjs-paginate';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Tenant } from 'src/tenant/entities';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangeUserStatusDto } from './dto';
+import { HashService } from 'src/auth/hash.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly hashService: HashService,
   ) {}
 
   async findByUsername(username: string): Promise<User | null> {
@@ -52,26 +55,21 @@ export class UserService {
   }
 
   async findAllUsers(query: PaginateQuery) {
-    console.log(query);
     return paginate(query, this.userRepository, {
       sortableColumns: ['name', 'id', 'status'],
       nullSort: 'first',
       searchableColumns: ['name', 'username', 'role'],
       defaultSortBy: [['id', 'DESC']],
+      relations: ['tenant'],
       defaultLimit: 10,
-      select: [
-        'id',
-        'name',
-        'username',
-        'role',
-        'status',
-        'createdAt',
-        'updatedAt',
-      ],
     });
   }
 
   async createUser(createUserDto: CreateUserDto, tenant: Tenant) {
+    const hashedPassword = this.hashService.getHashPassword(
+      createUserDto.password,
+    );
+    createUserDto.password = hashedPassword;
     return await this.userRepository.save({ ...createUserDto, tenant });
   }
 
@@ -83,6 +81,28 @@ export class UserService {
     if (!user.affected)
       throw new UnprocessableEntityException(
         'Parece que hubo un error al actualizar el usuario',
+      );
+    return await this.findOne(id);
+  }
+
+  async changeUserStatus(id: string, { status }: ChangeUserStatusDto) {
+    const user = await this.userRepository.update(id, { status });
+    console.log(user);
+    if (!user.affected)
+      throw new UnprocessableEntityException(
+        'Parece que hubo un error al actualizar el usuario',
+      );
+    return await this.findOne(id);
+  }
+
+  async changeUserPassword(id: string, newPassword: string) {
+    const hashedPassword = this.hashService.getHashPassword(newPassword);
+    const user = await this.userRepository.update(id, {
+      password: hashedPassword,
+    });
+    if (!user.affected)
+      throw new UnprocessableEntityException(
+        'Parece que hubo un error al actualizar la contraseña del usuario',
       );
     return await this.findOne(id);
   }

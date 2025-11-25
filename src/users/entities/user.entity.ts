@@ -1,3 +1,4 @@
+import { AuditLog } from '../../audit/entities/audit-log.entity';
 import { CommonEntityStatus } from '../../common/types/common-entity-status.type';
 import { Tenant } from '../../tenant/entities/tenant.entity';
 import {
@@ -5,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -34,6 +36,9 @@ export class User {
     foreignKeyConstraintName: 'fk_tenant_user',
   })
   tenant: Tenant;
+
+  @OneToMany(() => AuditLog, (audit) => audit.user)
+  auditLogs: AuditLog[];
 
   @Column({
     name: 'CREATED_AT',

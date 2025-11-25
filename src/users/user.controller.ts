@@ -18,6 +18,8 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { UserRole } from 'src/auth/interfaces/user-role.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { Tenant } from 'src/tenant/entities';
+import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
 
 @Controller('users')
 @Roles(UserRole.ADMIN)
@@ -62,6 +64,7 @@ export class UserController {
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
+    let tenant: Tenant | undefined;
     const currentUser = await this.userService.findOne(id);
 
     if (!currentUser) {
@@ -70,7 +73,7 @@ export class UserController {
       );
     }
     if (updateUserDto?.tenant) {
-      const tenant = await this.tenantService.findOne(updateUserDto.tenant);
+      tenant = await this.tenantService.findOne(updateUserDto.tenant);
       if (!tenant) {
         throw new BadRequestException(
           'La entidad a la que intentas asignar al usuario no es valida',
@@ -89,7 +92,14 @@ export class UserController {
     return await this.userService.updateUser(
       id,
       updateUserDto,
-      currentUser.tenant,
+      tenant ?? currentUser.tenant,
     );
+  }
+
+  @Patch('disable/:id')
+  async disableUser(@Param('id') id: string) {
+    return await this.userService.changeUserStatus(id, {
+      status: CommonEntityStatus.FALSE,
+    });
   }
 }

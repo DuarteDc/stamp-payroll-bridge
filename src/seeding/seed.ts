@@ -10,6 +10,7 @@ import { BlobConfigFactory } from './blob-config.factory';
 import { WorkflowLog } from '../workflow/entities/workflow-log.entity';
 import { UserFactory } from './user.factory';
 import { User } from '../users/entities/user.entity';
+import { AuditLog } from '../audit/entities/audit-log.entity';
 
 void (async () => {
   const options: DataSourceOptions & SeederOptions = {
@@ -29,6 +30,7 @@ void (async () => {
       BlobConfig,
       WorkflowLog,
       User,
+      AuditLog,
     ],
     synchronize: true,
     dropSchema: true,
