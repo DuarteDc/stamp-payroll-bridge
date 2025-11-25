@@ -5,11 +5,13 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { User as GetUser } from './decorators/user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { AuditAction } from 'src/audit/decorators/audit-action.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @AuditAction()
   @Post('/login')
   login(@Body() loginTenantDto: LoginTenantDto) {
     return this.authService.signIn(loginTenantDto);

@@ -20,6 +20,10 @@ import { UserRole } from 'src/auth/interfaces/user-role.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Tenant } from 'src/tenant/entities';
 import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
+import { AuditAction } from 'src/audit/decorators/audit-action.decorator';
+import { User } from './entities/user.entity';
+import { User as GetUser } from '../auth/decorators/user.decorator';
+import { ChangePasswordDto } from './dto';
 
 @Controller('users')
 @Roles(UserRole.ADMIN)
@@ -30,16 +34,18 @@ export class UserController {
     private readonly tenantService: TenantService,
   ) {}
 
+  @AuditAction('view', 'users')
   @Get('/')
-  async getAll(@Paginate() query: PaginateQuery) {
-    return await this.userService.findAllUsers(query);
+  async getAll(@GetUser() user: User, @Paginate() query: PaginateQuery) {
+    return await this.userService.findAllUsers(query, user.id);
   }
 
+  @AuditAction('view', 'detail')
   @Get(':id')
   async findUser(@Param('id') id: string) {
     return await this.userService.findOne(id);
   }
-
+  @AuditAction('create', 'user')
   @Post('/')
   async save(@Body() createUserDto: CreateUserDto) {
     const tenant = await this.tenantService.findOne(createUserDto.tenant);
@@ -59,6 +65,7 @@ export class UserController {
     return await this.userService.createUser(createUserDto, tenant);
   }
 
+  @AuditAction('update', 'user')
   @Patch(':id')
   async updateUser(
     @Param('id') id: string,
@@ -96,10 +103,20 @@ export class UserController {
     );
   }
 
+  @AuditAction('delete', 'user')
   @Patch('disable/:id')
   async disableUser(@Param('id') id: string) {
     return await this.userService.changeUserStatus(id, {
       status: CommonEntityStatus.FALSE,
     });
+  }
+
+  @Patch('change-password/:id')
+  @AuditAction('update', 'user password')
+  async changePassword(
+    @Param('id') id: string,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return await this.userService.changeUserPassword(id, changePasswordDto);
   }
 }

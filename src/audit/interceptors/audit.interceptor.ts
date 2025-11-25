@@ -27,10 +27,9 @@ export class AuditInterceptor implements NestInterceptor {
     );
 
     if (action) {
-      const req = context.switchToHttp().getRequest(); // Ya tiene req.user tipado
-
+      const req = context.switchToHttp().getRequest();
       await this.auditService.create({
-        userId: req.user?.id || '',
+        user: req.user,
         ip: req.ip ?? '',
         userAgent: req.headers['user-agent'] ?? '',
         path: req.originalUrl,

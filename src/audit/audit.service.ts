@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AuditLog } from './entities/audit-log.entity';
 import { Repository } from 'typeorm';
 import { CreateAuditDto } from './dtos/create-audit.dto';
+import { paginate, PaginateQuery } from 'nestjs-paginate';
 
 @Injectable()
 export class AuditService {
@@ -22,12 +23,17 @@ export class AuditService {
     });
   }
 
-  async findByUser(userId: string) {
-    return await this.auditRepository.find({
-      where: { user: { id: userId } },
-      order: { createdAt: 'DESC' },
-      relations: {
-        user: true,
+  async findByUser(userId: string, query: PaginateQuery) {
+    return paginate(query, this.auditRepository, {
+      sortableColumns: ['id', 'createdAt', 'path'],
+      nullSort: 'first',
+      maxLimit: 10,
+      searchableColumns: ['action', 'method', 'action'],
+      defaultSortBy: [['createdAt', 'DESC']],
+      where: {
+        user: {
+          id: userId,
+        },
       },
     });
   }

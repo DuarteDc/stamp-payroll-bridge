@@ -1,13 +1,17 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 import { User } from './entities/user.entity';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Tenant } from 'src/tenant/entities';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ChangeUserStatusDto } from './dto';
+import { ChangePasswordDto, ChangeUserStatusDto } from './dto';
 import { HashService } from 'src/auth/hash.service';
 
 @Injectable()
@@ -54,7 +58,7 @@ export class UserService {
     }
   }
 
-  async findAllUsers(query: PaginateQuery) {
+  async findAllUsers(query: PaginateQuery, userId: string) {
     return paginate(query, this.userRepository, {
       sortableColumns: ['name', 'id', 'status'],
       nullSort: 'first',
@@ -62,6 +66,9 @@ export class UserService {
       defaultSortBy: [['id', 'DESC']],
       relations: ['tenant'],
       defaultLimit: 10,
+      where: {
+        id: Not(userId),
+      },
     });
   }
 
@@ -95,8 +102,13 @@ export class UserService {
     return await this.findOne(id);
   }
 
-  async changeUserPassword(id: string, newPassword: string) {
-    const hashedPassword = this.hashService.getHashPassword(newPassword);
+  async changeUserPassword(
+    id: string,
+    { password, comfirmPassword }: ChangePasswordDto,
+  ) {
+    if (password !== comfirmPassword)
+      throw new BadRequestException('Las contraseñas no coinciden');
+    const hashedPassword = this.hashService.getHashPassword(password);
     const user = await this.userRepository.update(id, {
       password: hashedPassword,
     });

@@ -27,6 +27,8 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { AuditModule } from './audit/audit.module';
 import { AuditLog } from './audit/entities/audit-log.entity';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { AuditInterceptor } from './audit/interceptors/audit.interceptor';
 
 @Module({
   imports: [
@@ -79,6 +81,9 @@ import { AuditLog } from './audit/entities/audit-log.entity';
     AuditModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+  ],
 })
 export class AppModule {}

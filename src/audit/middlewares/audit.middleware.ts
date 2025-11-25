@@ -27,9 +27,9 @@ export class AuditMiddleware implements NestMiddleware {
       try {
         const { id } = this.tokenService.verify(token) as JWTPayload;
         const user = await this.userService.findOne(id);
-
         req.user = user;
       } catch (error) {
+        console.log(error);
         throw new UnauthorizedException('Invalid credentiasl');
       }
     }
