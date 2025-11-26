@@ -1,4 +1,4 @@
-import { IsIn, IsString, IsStrongPassword } from 'class-validator';
+import { IsString, IsStrongPassword } from 'class-validator';
 import { Trim } from 'src/common/decorators/trim.decorator';
 
 export class ChangePasswordDto {
@@ -20,8 +20,5 @@ export class ChangePasswordDto {
     minUppercase: 1,
     minSymbols: 1,
   })
-  @IsIn([Math.random()], {
-    message: 'Las contraseñas no son iguales',
-  })
-  comfirmPassword: string;
+  confirmPassword: string;
 }

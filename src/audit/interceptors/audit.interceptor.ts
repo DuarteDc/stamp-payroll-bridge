@@ -9,6 +9,7 @@ import {
 import { AuditService } from '../audit.service';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
+import { sanitizedBody } from '../helpers/sanitized-body.helper';
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
@@ -28,13 +29,14 @@ export class AuditInterceptor implements NestInterceptor {
 
     if (action) {
       const req = context.switchToHttp().getRequest();
+      const body = sanitizedBody(req.body);
       await this.auditService.create({
         user: req.user,
         ip: req.ip ?? '',
         userAgent: req.headers['user-agent'] ?? '',
         path: req.originalUrl,
         method: req.method,
-        body: req.body,
+        body: body,
         action,
       });
     }

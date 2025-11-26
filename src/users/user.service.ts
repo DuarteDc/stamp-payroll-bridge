@@ -104,9 +104,11 @@ export class UserService {
 
   async changeUserPassword(
     id: string,
-    { password, comfirmPassword }: ChangePasswordDto,
+    { password, confirmPassword }: ChangePasswordDto,
   ) {
-    if (password !== comfirmPassword)
+    console.log(password);
+    console.log(confirmPassword);
+    if (password !== confirmPassword)
       throw new BadRequestException('Las contraseñas no coinciden');
     const hashedPassword = this.hashService.getHashPassword(password);
     const user = await this.userRepository.update(id, {
