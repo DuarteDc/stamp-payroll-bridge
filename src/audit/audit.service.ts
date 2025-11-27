@@ -17,9 +17,28 @@ export class AuditService {
     return await this.auditRepository.save(log);
   }
 
-  async findAll() {
-    return await this.auditRepository.find({
-      order: { createdAt: 'DESC' },
+  async findAll(query: PaginateQuery) {
+    const queryBuilder = this.auditRepository
+      .createQueryBuilder('audit')
+      .leftJoin('audit.user', 'user')
+      .leftJoin('user.tenant', 'tenant')
+      .addSelect([
+        'user.id',
+        'user.name',
+        'user.username',
+        'user.role',
+        'tenant.id',
+        'tenant.name',
+        'tenant.abbreviation',
+        'tenant.rfc',
+      ]);
+
+    return paginate(query, queryBuilder, {
+      sortableColumns: ['id', 'createdAt', 'path'],
+      nullSort: 'first',
+      maxLimit: 10,
+      searchableColumns: ['action', 'method', 'action'],
+      defaultSortBy: [['createdAt', 'DESC']],
     });
   }
 

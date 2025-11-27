@@ -29,6 +29,11 @@ export class AuditController {
     return this.auditService.findByUser(id, query);
   }
 
+  @Get('')
+  getAll(@nestjsPaginate.Paginate() query: nestjsPaginate.PaginateQuery) {
+    return this.auditService.findAll(query);
+  }
+
   @Post('track')
   tranckFrontend(@Body() body: { path: string }, @Req() request: Request) {
     return this.auditService.create({
