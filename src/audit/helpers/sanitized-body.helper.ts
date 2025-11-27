@@ -8,6 +8,7 @@ export const sanitizedBody = (body: any) => {
     'password',
     'newPassword',
     'oldPassword',
+    'sas',
     'confirmPassword',
     'pass',
     'token',
