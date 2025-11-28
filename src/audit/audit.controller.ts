@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -30,8 +31,12 @@ export class AuditController {
   }
 
   @Get('')
-  getAll(@nestjsPaginate.Paginate() query: nestjsPaginate.PaginateQuery) {
-    return this.auditService.findAll(query);
+  getAll(
+    @nestjsPaginate.Paginate() query: nestjsPaginate.PaginateQuery,
+    @Query('date') date?: string,
+    @Query('method') method?: string,
+  ) {
+    return this.auditService.findAll(query, date, method);
   }
 
   @Post('track')

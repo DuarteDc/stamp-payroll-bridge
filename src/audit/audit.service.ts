@@ -17,7 +17,7 @@ export class AuditService {
     return await this.auditRepository.save(log);
   }
 
-  async findAll(query: PaginateQuery) {
+  async findAll(query: PaginateQuery, date?: string, method?: string) {
     const queryBuilder = this.auditRepository
       .createQueryBuilder('audit')
       .leftJoin('audit.user', 'user')
@@ -33,11 +33,39 @@ export class AuditService {
         'tenant.rfc',
       ]);
 
+    if (date) {
+      const start = new Date(`${date} 00:00:00`);
+      const end = new Date(`${date} 23:59:59.999`);
+
+      queryBuilder.andWhere('audit.createdAt BETWEEN :start AND :end', {
+        start,
+        end,
+      });
+    }
+
+    if (method) {
+      queryBuilder.andWhere('audit.method = :method', {
+        method: method.toUpperCase(),
+      });
+    }
+
     return paginate(query, queryBuilder, {
       sortableColumns: ['id', 'createdAt', 'path'],
       nullSort: 'first',
       maxLimit: 10,
-      searchableColumns: ['action', 'method', 'action'],
+      relations: ['user', 'user.tenant'],
+      searchableColumns: [
+        'action',
+        'method',
+        'action',
+        'createdAt',
+        'path',
+        'user.name',
+        'user.username',
+        'user.tenant.name',
+        'user.tenant.rfc',
+        'user.tenant.abbreviation',
+      ],
       defaultSortBy: [['createdAt', 'DESC']],
     });
   }
