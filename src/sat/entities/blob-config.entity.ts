@@ -7,6 +7,7 @@ import {
 } from 'typeorm';
 import { Tenant } from '../../tenant/entities';
 import { CommonEntityStatus } from '../../common/types/common-entity-status.type';
+import { User } from '../../users/entities/user.entity';
 
 @Entity({
   name: 'BLOB_CONFIG',
@@ -30,6 +31,12 @@ export class BlobConfig {
     foreignKeyConstraintName: 'fk_tenant_blobconfig',
   })
   tenant: Tenant;
+
+  @JoinColumn({
+    name: 'USER_ID',
+    foreignKeyConstraintName: 'fk_blobconfig_user',
+  })
+  user: User;
 
   @Column({
     name: 'CREATED_AT',

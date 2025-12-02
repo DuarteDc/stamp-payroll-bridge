@@ -1,3 +1,4 @@
+import { BlobConfig } from '../../sat/entities/blob-config.entity';
 import { AuditLog } from '../../audit/entities/audit-log.entity';
 import { CommonEntityStatus } from '../../common/types/common-entity-status.type';
 import { Tenant } from '../../tenant/entities/tenant.entity';
@@ -36,6 +37,9 @@ export class User {
     foreignKeyConstraintName: 'fk_tenant_user',
   })
   tenant: Tenant;
+
+  @OneToMany(() => BlobConfig, (blobConfig) => blobConfig.tenant)
+  blobConfigs: BlobConfig[];
 
   @OneToMany(() => AuditLog, (audit) => audit.user)
   auditLogs: AuditLog[];
