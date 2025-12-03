@@ -38,7 +38,7 @@ export class User {
   })
   tenant: Tenant;
 
-  @OneToMany(() => BlobConfig, (blobConfig) => blobConfig.tenant)
+  @OneToMany(() => BlobConfig, (blobConfig) => blobConfig.user)
   blobConfigs: BlobConfig[];
 
   @OneToMany(() => AuditLog, (audit) => audit.user)

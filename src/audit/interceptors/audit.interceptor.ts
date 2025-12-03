@@ -10,6 +10,8 @@ import { AuditService } from '../audit.service';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
 import { sanitizedBody } from '../helpers/sanitized-body.helper';
+import { AuditActionOptions } from '../decorators/audit-action.decorator';
+import { resolveDynamicPath } from '../helpers/resolve-dynamic-paths.helper';
 
 @Injectable()
 export class AuditInterceptor implements NestInterceptor {
@@ -22,19 +24,26 @@ export class AuditInterceptor implements NestInterceptor {
     context: ExecutionContext,
     next: CallHandler,
   ): Promise<Observable<any>> {
-    const action = this.reflector.get<string>(
+    const meta = this.reflector.get<AuditActionOptions>(
       'audit_action',
       context.getHandler(),
     );
+    const action = meta?.description
+      ? `${meta.action} - ${meta.description}`
+      : (meta?.action ?? null);
 
     if (action) {
       const req = context.switchToHttp().getRequest();
+      const customPath = meta?.path
+        ? resolveDynamicPath(meta.path, req.params)
+        : null;
+
       const body = sanitizedBody(req.body);
       await this.auditService.create({
         user: req.user,
         ip: req.ip ?? '',
         userAgent: req.headers['user-agent'] ?? '',
-        path: req.originalUrl,
+        path: customPath ?? req.originalUrl,
         method: req.method,
         body: body,
         action,

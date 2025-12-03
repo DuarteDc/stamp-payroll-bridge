@@ -1,4 +1,3 @@
-// audit/decorators/audit-action.decorator.ts
 import { SetMetadata } from '@nestjs/common';
 
 export const AUDIT_ACTION = 'audit_action';
@@ -12,8 +11,22 @@ export type AuditActionType =
   | 'view'
   | 'custom';
 
+export interface AuditActionOptions {
+  action?: AuditActionType | null;
+  description?: string;
+  path?: string; // 👈 custom path opcional
+}
+
 export const AuditAction = (
-  action: AuditActionType | null = null,
-  desciption?: string,
-) =>
-  SetMetadata(AUDIT_ACTION, desciption ? `${action} - ${desciption}` : action);
+  action?: AuditActionType | null,
+  description?: string,
+  path?: string,
+) => {
+  const metadata: AuditActionOptions = {
+    action: action ?? null,
+    description: description ?? undefined,
+    path: path ?? undefined,
+  };
+
+  return SetMetadata(AUDIT_ACTION, metadata);
+};

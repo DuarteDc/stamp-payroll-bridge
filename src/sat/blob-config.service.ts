@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
 import { CreateSasDto } from './entities/dtos/create-sas.dto';
 import { Tenant } from 'src/tenant/entities';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class BlobConfigService {
@@ -31,7 +32,7 @@ export class BlobConfigService {
     });
   }
 
-  async createSas(sasId: string, createSasDto: CreateSasDto) {
+  async createSas(sasId: string, createSasDto: CreateSasDto, user: User) {
     const sas = await this.blobConfigRepository.findOne({
       where: {
         id: sasId,
@@ -61,6 +62,21 @@ export class BlobConfigService {
       containerName: createSasDto.containerName,
       sasToken: createSasDto.sas,
       tenant,
+      user,
+    });
+  }
+
+  async getHistoryOfSas(tenantId: string) {
+    return await this.blobConfigRepository.find({
+      where: {
+        tenant: {
+          id: tenantId,
+        },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['user'],
     });
   }
 }

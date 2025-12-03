@@ -31,7 +31,7 @@ export class BlobConfig {
     foreignKeyConstraintName: 'fk_tenant_blobconfig',
   })
   tenant: Tenant;
-
+  @ManyToOne(() => User, (user) => user.blobConfigs)
   @JoinColumn({
     name: 'USER_ID',
     foreignKeyConstraintName: 'fk_blobconfig_user',
