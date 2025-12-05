@@ -1,9 +1,13 @@
 import { Repository } from 'typeorm';
-import { Job } from './entities/job.entity';
+import { Job, JobStatus, JobType } from './entities/job.entity';
 import { Tenant } from 'src/tenant/entities';
 
 import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { SatService } from 'src/sat/sat.service';
 import { JobActions } from 'src/common/jobs/constants/job-action.constant';
 import { JobEvent } from './entities';
@@ -121,16 +125,74 @@ export class JobsService {
     return this.satService.checkStatus(job.externalReference);
   }
 
-  async findJobsByTenant(query: PaginateQuery, tenantId: string) {
-    return paginate(query, this.jobRepository, {
+  async findJobsByTenant(
+    query: PaginateQuery,
+    tenantId: string,
+    date?: string,
+  ) {
+    const queryBuilder = this.jobRepository
+      .createQueryBuilder('job')
+      .leftJoin('job.tenant', 'tenant');
+
+    if (date) {
+      const start = new Date(`${date} 00:00:00`);
+      const end = new Date(`${date} 23:59:59.999`);
+
+      queryBuilder.andWhere('job.createdAt BETWEEN :start AND :end', {
+        start,
+        end,
+      });
+    }
+    return paginate(query, queryBuilder, {
       sortableColumns: ['id', 'createdAt', 'externalReference'],
       nullSort: 'last',
       defaultSortBy: [['createdAt', 'DESC']],
+      searchableColumns: [
+        'externalReference',
+        'id',
+        'status',
+        'createdAt',
+        'tenant.name',
+        'tenant.rfc',
+      ],
       where: {
         tenant: {
           id: tenantId,
         },
       },
+      relations: ['tenant'],
+      defaultLimit: 10,
+    });
+  }
+
+  async findAllJobs(query: PaginateQuery, date?: string) {
+    const queryBuilder = this.jobRepository
+      .createQueryBuilder('job')
+      .leftJoin('job.tenant', 'tenant');
+
+    if (date) {
+      const start = new Date(`${date} 00:00:00`);
+      const end = new Date(`${date} 23:59:59.999`);
+
+      queryBuilder.andWhere('job.createdAt BETWEEN :start AND :end', {
+        start,
+        end,
+      });
+    }
+
+    return paginate(query, queryBuilder, {
+      sortableColumns: ['id', 'createdAt', 'externalReference'],
+      nullSort: 'last',
+      defaultSortBy: [['createdAt', 'DESC']],
+      searchableColumns: [
+        'externalReference',
+        'id',
+        'status',
+        'createdAt',
+        'tenant.name',
+        'tenant.rfc',
+      ],
+      relations: ['tenant'],
       defaultLimit: 10,
     });
   }
@@ -148,5 +210,75 @@ export class JobsService {
       throw new NotFoundException('No existe un job con el id proporcionado');
     }
     return job;
+  }
+
+  async startCancelProcess(rfc: string, _file: string) {
+    const tenant = await this.tenantRepository.findOne({
+      where: { rfc, status: CommonEntityStatus.TRUE },
+    });
+    if (!tenant) {
+      throw new BadRequestException('El rfc de la entidad no es valido');
+    }
+
+    let job = await this.jobRepository.save({
+      tenant: tenant,
+      status: JobStatus.IN_PROGRESS,
+      externalReference: 'PKG' + Math.floor(Math.random() * 1000000),
+      type: JobType.CANCEL,
+    });
+    await this.logger.log(
+      tenant.id,
+      `Iniciando el proceso de cancelacion para ${tenant.name} - ${tenant.rfc}`,
+      'start',
+      job.id,
+    );
+
+    await this.logger.log(
+      tenant.id,
+      'Creando conexión SOAP',
+      'pending',
+      job.id,
+    );
+
+    await this.logger.log(
+      tenant.id,
+      'Estableciendo WS-Security',
+      'pending',
+      job.id,
+    );
+
+    await this.logger.log(
+      tenant.id,
+      'Creando cuerpo de la peticion',
+      'start',
+      job.id,
+    );
+
+    await this.logger.log(
+      tenant.id,
+      'Enviando cancelación al SAT',
+      'start',
+      job.id,
+    );
+
+    job.status = JobStatus.CANCELADO;
+
+    job = await this.jobRepository.save(job);
+
+    const response = {
+      uriZipEnviado: 'https://.../cancelacion.zip?sv...',
+      respuestaSat: {
+        UrlSalida: 'https://.../acuseCancelacion.zip?sv...',
+        Respuesta: 'La cancelación de los comprobantes ha concluido.',
+        CodRespuesta: 200,
+      },
+    };
+    await this.logger.log(
+      tenant.id,
+      `El SAT respondio la siguiente informacion ${JSON.stringify(response)}`,
+      'start',
+      job.id,
+    );
+    return response;
   }
 }

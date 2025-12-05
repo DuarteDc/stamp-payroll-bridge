@@ -5,7 +5,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { WorkflowLog } from './entities/workflow-log.entity';
 import { Tenant } from 'src/tenant/entities';
 import { Job, JobStatus } from 'src/jobs/entities/job.entity';
-import { interval, map } from 'rxjs';
 
 @Injectable()
 export class WorkflowLoggerService {
@@ -60,7 +59,7 @@ export class WorkflowLoggerService {
     const getActivePayrollProcess = await this.jobRepository.find({
       where: {
         tenant: { id: tenantId },
-        status: JobStatus.RECEIVED,
+        status: JobStatus.IN_PROGRESS,
       },
     });
     console.log(getActivePayrollProcess);

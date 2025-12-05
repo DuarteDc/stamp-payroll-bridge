@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { BlobConfigService } from './blob-config.service';
 import { Roles } from 'src/auth/decorators/role.decorator';
 import { UserRole } from 'src/auth/interfaces/user-role.interface';
@@ -8,6 +16,7 @@ import { CreateSasDto } from './entities/dtos/create-sas.dto';
 import { AuditAction } from 'src/audit/decorators/audit-action.decorator';
 import { User } from 'src/users/entities/user.entity';
 import { User as GetUser } from 'src/auth/decorators/user.decorator';
+import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
 @Controller('blob-config')
 @Roles(UserRole.ADMIN)
 @UseGuards(AuthGuard(), RolesGuard)
@@ -16,8 +25,12 @@ export class BlobConfigController {
 
   @AuditAction('view', 'get all sas configuration', '/configuration')
   @Get('')
-  getAll() {
-    return this.blobConfigService.getActiveSAS();
+  getAll(@Query('status') status: string) {
+    let query: string = CommonEntityStatus.TRUE;
+    if (status && status.toLowerCase() === 'disabled') {
+      query = CommonEntityStatus.FALSE;
+    }
+    return this.blobConfigService.getActiveSAS(query);
   }
 
   @Post(':id')

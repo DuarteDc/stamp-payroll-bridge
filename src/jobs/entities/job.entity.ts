@@ -11,13 +11,17 @@ import { Tenant } from '../../tenant/entities';
 import { WorkflowLog } from '../../workflow/entities/workflow-log.entity';
 
 export enum JobStatus {
-  RECEIVED = 'RECEIVED',
-  SEALED = 'SEALED',
-  SUBMITTED = 'SUBMITTED',
+  IN_PROGRESS = 'EN PROCESO',
+  SUBMITTED = 'ENVIADO',
   TIMBRADO = 'TIMBRADO',
   ERROR = 'ERROR',
+  CANCELADO = 'CANCELADO',
 }
 
+export enum JobType {
+  STAMP = 'STAMP',
+  CANCEL = 'CANCEL',
+}
 @Entity({ name: 'JOBS' })
 export class Job {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
@@ -29,9 +33,16 @@ export class Job {
   @Column({
     name: 'STATUS',
     type: 'varchar2',
-    default: JobStatus.RECEIVED,
+    default: JobStatus.SUBMITTED,
   })
   status: string;
+
+  @Column({
+    name: 'TYPE',
+    type: 'varchar2',
+    default: JobType.STAMP,
+  })
+  type: string;
 
   @Column({
     name: 'CREATED_AT',

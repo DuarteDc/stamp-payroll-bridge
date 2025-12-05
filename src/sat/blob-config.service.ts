@@ -16,17 +16,18 @@ export class BlobConfigService {
     private readonly tenantRepository: Repository<Tenant>,
   ) {}
 
-  async getActiveSAS() {
-    return await this.blobConfigRepository.find({
+  async getActiveSAS(status: string) {
+    return await this.tenantRepository.find({
       where: {
-        status: '1',
+        status: status,
+        blobConfigs: {
+          status: CommonEntityStatus.TRUE,
+        },
       },
-      relations: ['tenant'],
+      relations: ['blobConfigs'],
       order: {
-        tenant: {
-          name: {
-            direction: 'ASC',
-          },
+        name: {
+          direction: 'ASC',
         },
       },
     });

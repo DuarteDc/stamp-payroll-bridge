@@ -20,7 +20,7 @@ export class WorkflowController {
   ): Observable<MessageEvent> {
     return new Observable((observer) => {
       this.workflowLoggerService
-        .getLogsByTenant(user.id, jobId)
+        .getLogsByTenant(user.tenant.id, jobId)
         .then((previousLogs) => {
           for (const log of previousLogs) {
             observer.next(
