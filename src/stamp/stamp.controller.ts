@@ -41,6 +41,7 @@ export class StampController {
 
   @Post('cancel/:rfc')
   @UseInterceptors(FileInterceptor('file'))
+  @AuditAction('update', 'Stamp cancellation record')
   async cancel(
     @UploadedFile() file: Express.Multer.File,
     @Param('rfc') rfc: string,

@@ -7,12 +7,14 @@ import { User as GetUser } from '../auth/decorators/user.decorator';
 import { Job } from './entities';
 import { User } from 'src/users/entities/user.entity';
 import { UserRole } from 'src/auth/constants/user-role.constant';
+import { AuditAction } from 'src/audit/decorators/audit-action.decorator';
 
 @Controller('jobs')
 @UseGuards(AuthGuard())
 export class JobsController {
   constructor(private readonly jobsService: JobsService) {}
 
+  @AuditAction('view', 'show all stamp process', 'payroll')
   @Get('/')
   async findAll(
     @Paginate() query: PaginateQuery,
@@ -29,6 +31,7 @@ export class JobsController {
     return await this.jobsService.findAllJobs(query, date);
   }
 
+  @AuditAction('view', 'show stamp process with job id', '/logs/{id}')
   @Get(':id')
   async findOne(@Param('id') jobId: string) {
     return await this.jobsService.findJobDetail(jobId);
