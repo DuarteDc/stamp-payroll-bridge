@@ -129,6 +129,7 @@ export class JobsService {
     query: PaginateQuery,
     tenantId: string,
     date?: string,
+    tenant?: string,
   ) {
     const queryBuilder = this.jobRepository
       .createQueryBuilder('job')
@@ -141,6 +142,11 @@ export class JobsService {
       queryBuilder.andWhere('job.createdAt BETWEEN :start AND :end', {
         start,
         end,
+      });
+    }
+    if (tenant) {
+      queryBuilder.andWhere('tenant.abbreviation = :tenant', {
+        tenant,
       });
     }
     return paginate(query, queryBuilder, {
@@ -165,7 +171,7 @@ export class JobsService {
     });
   }
 
-  async findAllJobs(query: PaginateQuery, date?: string) {
+  async findAllJobs(query: PaginateQuery, date?: string, tenant?: string) {
     const queryBuilder = this.jobRepository
       .createQueryBuilder('job')
       .leftJoin('job.tenant', 'tenant');
@@ -177,6 +183,11 @@ export class JobsService {
       queryBuilder.andWhere('job.createdAt BETWEEN :start AND :end', {
         start,
         end,
+      });
+    }
+    if (tenant) {
+      queryBuilder.andWhere('tenant.abbreviation = :tenant', {
+        tenant,
       });
     }
 
@@ -191,6 +202,7 @@ export class JobsService {
         'createdAt',
         'tenant.name',
         'tenant.rfc',
+        'tenant.abbreviation',
       ],
       relations: ['tenant'],
       defaultLimit: 10,

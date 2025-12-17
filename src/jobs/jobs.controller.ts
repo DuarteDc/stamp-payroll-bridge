@@ -20,15 +20,18 @@ export class JobsController {
     @Paginate() query: PaginateQuery,
     @GetUser() user: User,
     @Query('date') date?: string,
+    @Query('tenant') tenant?: string,
   ): Promise<Paginated<Job>> {
+    console.log(tenant);
     if (user.role === UserRole.USER) {
       return await this.jobsService.findJobsByTenant(
         query,
         user.tenant.id,
         date,
+        tenant,
       );
     }
-    return await this.jobsService.findAllJobs(query, date);
+    return await this.jobsService.findAllJobs(query, date, tenant);
   }
 
   @AuditAction('view', 'show stamp process with job id', '/logs/{id}')
