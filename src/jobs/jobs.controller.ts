@@ -8,6 +8,7 @@ import { Job } from './entities';
 import { User } from 'src/users/entities/user.entity';
 import { UserRole } from 'src/auth/constants/user-role.constant';
 import { AuditAction } from 'src/audit/decorators/audit-action.decorator';
+import { JOB_STATUS } from './constants/job-status.constant';
 
 @Controller('jobs')
 @UseGuards(AuthGuard())
@@ -22,7 +23,6 @@ export class JobsController {
     @Query('date') date?: string,
     @Query('tenant') tenant?: string,
   ): Promise<Paginated<Job>> {
-    console.log(tenant);
     if (user.role === UserRole.USER) {
       return await this.jobsService.findJobsByTenant(
         query,
@@ -32,6 +32,25 @@ export class JobsController {
       );
     }
     return await this.jobsService.findAllJobs(query, date, tenant);
+  }
+
+  @Get('/statistics')
+  async getLastOfStamp() {
+    const lastMonthStampedPromise = this.jobsService.findStampPerMonth(
+      JOB_STATUS.STAMPED,
+    );
+    const lastMonthInProgressPromise = this.jobsService.findStampPerMonth(
+      JOB_STATUS.SUBMITTED,
+    );
+    const [lastMonthStamped, lastMonthInProgress] = await Promise.all([
+      lastMonthStampedPromise,
+      lastMonthInProgressPromise,
+    ]);
+
+    return {
+      lastMonthStamped,
+      lastMonthInProgress,
+    };
   }
 
   @AuditAction('view', 'show stamp process with job id', '/logs/{id}')

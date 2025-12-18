@@ -1,5 +1,5 @@
 import { Repository } from 'typeorm';
-import { Job, JobStatus, JobType } from './entities/job.entity';
+import { Job, JobType } from './entities/job.entity';
 import { Tenant } from 'src/tenant/entities';
 
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,6 +16,7 @@ import { Queue } from 'bullmq';
 import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
 import { WorkflowLoggerService } from 'src/workflow/workflow-logger.service';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
+import { JOB_STATUS } from './constants/job-status.constant';
 interface PollingQueueData {
   packageId: string;
   rfc: string;
@@ -234,7 +235,7 @@ export class JobsService {
 
     let job = await this.jobRepository.save({
       tenant: tenant,
-      status: JobStatus.IN_PROGRESS,
+      status: JOB_STATUS.IN_PROGRESS,
       externalReference: 'PKG' + Math.floor(Math.random() * 1000000),
       type: JobType.CANCEL,
     });
@@ -273,7 +274,7 @@ export class JobsService {
       job.id,
     );
 
-    job.status = JobStatus.CANCELADO;
+    job.status = JOB_STATUS.CANCELADO;
 
     job = await this.jobRepository.save(job);
 
@@ -292,5 +293,15 @@ export class JobsService {
       job.id,
     );
     return response;
+  }
+
+  async findStampPerMonth(
+    status: (typeof JOB_STATUS)[keyof typeof JOB_STATUS],
+  ) {
+    return await this.jobRepository.count({
+      where: {
+        status,
+      },
+    });
   }
 }

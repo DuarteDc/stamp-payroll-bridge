@@ -9,19 +9,14 @@ import {
 import { JobEvent } from './job-event.entity';
 import { Tenant } from '../../tenant/entities';
 import { WorkflowLog } from '../../workflow/entities/workflow-log.entity';
-
-export enum JobStatus {
-  IN_PROGRESS = 'EN PROCESO',
-  SUBMITTED = 'ENVIADO',
-  TIMBRADO = 'TIMBRADO',
-  ERROR = 'ERROR',
-  CANCELADO = 'CANCELADO',
-}
+import { JOB_STATUS } from '../constants/job-status.constant';
 
 export enum JobType {
   STAMP = 'STAMP',
   CANCEL = 'CANCEL',
 }
+
+export type JobStatus = (typeof JOB_STATUS)[keyof typeof JOB_STATUS];
 @Entity({ name: 'JOBS' })
 export class Job {
   @PrimaryGeneratedColumn('uuid', { name: 'ID' })
@@ -33,9 +28,9 @@ export class Job {
   @Column({
     name: 'STATUS',
     type: 'varchar2',
-    default: JobStatus.SUBMITTED,
+    default: JOB_STATUS.SUBMITTED,
   })
-  status: string;
+  status: JobStatus;
 
   @Column({
     name: 'TYPE',

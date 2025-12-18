@@ -1,0 +1,7 @@
+export const JOB_STATUS = {
+  IN_PROGRESS: 'EN_PROCESO',
+  SUBMITTED: 'ENVIADO',
+  STAMPED: 'TIMBRADO',
+  ERROR: 'ERROR',
+  CANCELADO: 'CANCELADO',
+} as const;
