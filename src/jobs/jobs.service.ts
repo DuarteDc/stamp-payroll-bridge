@@ -17,6 +17,7 @@ import { CommonEntityStatus } from 'src/common/types/common-entity-status.type';
 import { WorkflowLoggerService } from 'src/workflow/workflow-logger.service';
 import { paginate, PaginateQuery } from 'nestjs-paginate';
 import { JOB_STATUS } from './constants/job-status.constant';
+import { WorkflowEventBusService } from './workflow-event-bus.service';
 interface PollingQueueData {
   packageId: string;
   rfc: string;
@@ -36,6 +37,7 @@ export class JobsService {
     @InjectQueue('polling')
     private readonly pollingQueue: Queue<PollingQueueData>,
     private readonly logger: WorkflowLoggerService,
+    private readonly workflowEventBusService: WorkflowEventBusService,
   ) {}
 
   async createDefaultJob(tenantRfc: string, filePath: string): Promise<Job> {
@@ -54,7 +56,13 @@ export class JobsService {
 
     let job = await this.jobRepository.save({
       tenant: tenant,
-      status: 'RECEIVED',
+      status: JOB_STATUS.SUBMITTED,
+    });
+    this.workflowEventBusService.emit({
+      type: JOB_STATUS.SUBMITTED,
+      userId: tenant.id,
+      workflowId: job.id,
+      createdAt: new Date(),
     });
     await this.logger.log(
       tenant.id,
