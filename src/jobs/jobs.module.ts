@@ -11,6 +11,7 @@ import { WorkflowModule } from 'src/workflow/workflow.module';
 import { JobsController } from './jobs.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
+import { WorkflowService } from 'src/workflow/workflow.service';
 
 @Module({
   controllers: [JobsController],
@@ -24,7 +25,7 @@ import { PassportModule } from '@nestjs/passport';
       name: 'polling',
     }),
   ],
-  providers: [JobsService, JobsProcessor],
+  providers: [JobsService, JobsProcessor, WorkflowService],
   exports: [JobsService],
 })
 export class JobsModule {}

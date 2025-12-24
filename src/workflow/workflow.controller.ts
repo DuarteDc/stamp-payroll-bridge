@@ -1,34 +1,39 @@
-import { Controller, Param, Sse, UseGuards } from '@nestjs/common';
-import { filter, map, merge, Observable } from 'rxjs';
+import { Controller, Inject, Param, Sse, UseGuards } from '@nestjs/common';
+import { Observable } from 'rxjs';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { WorkflowLoggerService } from './workflow-logger.service';
 import { AuthGuard } from '@nestjs/passport';
 import { User as GetUser } from '../auth/decorators/user.decorator';
 import { User } from 'src/users/entities/user.entity';
-import { WorkflowEventBusService } from 'src/jobs/workflow-event-bus.service';
+import { REDIS_PUBSUB, WORKFLOW_CHANNEL } from './constants/redis.constants';
+import Redis from 'ioredis';
+import { WorkflowEvent } from './interfaces/workflow-event.interface';
 @Controller('workflow')
 @UseGuards(AuthGuard())
 export class WorkflowController {
   constructor(
     private readonly eventEmitter: EventEmitter2,
     private readonly workflowLoggerService: WorkflowLoggerService,
-    private readonly workflowEventBusService: WorkflowEventBusService,
+    @Inject(REDIS_PUBSUB) private readonly redis: Redis,
   ) {}
 
   @Sse('status')
   sendActiveProcess(@GetUser() user: User) {
-    return merge(
-      this.workflowEventBusService.stream$.pipe(
-        filter((e) => e.userId === user.id),
-      ),
-    ).pipe(
-      map(
-        (data) =>
-          new MessageEvent('message', {
-            data: JSON.stringify(data),
-          }),
-      ),
-    );
+    return new Observable((observer) => {
+      const subscriber = this.redis.duplicate();
+      subscriber.subscribe(WORKFLOW_CHANNEL);
+      subscriber.on('message', (_channel: string, message: string) => {
+        const event = JSON.parse(message) as WorkflowEvent;
+        if (event.tenant.id === user.tenant.id) {
+          observer.next(new MessageEvent('message', { data: message }));
+        }
+      });
+
+      return () => {
+        subscriber.unsubscribe();
+        subscriber.quit();
+      };
+    });
   }
 
   @Sse(':jobId')

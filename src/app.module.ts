@@ -29,6 +29,7 @@ import { AuditModule } from './audit/audit.module';
 import { AuditLog } from './audit/entities/audit-log.entity';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './audit/interceptors/audit.interceptor';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { AuditInterceptor } from './audit/interceptors/audit.interceptor';
     UsersModule,
     AuthModule,
     AuditModule,
+    RedisModule,
   ],
   controllers: [AppController],
   providers: [

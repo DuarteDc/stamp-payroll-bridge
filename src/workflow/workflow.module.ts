@@ -5,16 +5,19 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { WorkflowLog } from './entities/workflow-log.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
-import { WorkflowEventBusService } from 'src/jobs/workflow-event-bus.service';
+import { WorkflowService } from './workflow.service';
+import { WorkflowEventPublisher } from './workflow-event.publisher';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([WorkflowLog]),
     AuthModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
+    RedisModule,
   ],
   controllers: [WorkflowController],
-  providers: [WorkflowLoggerService, WorkflowEventBusService],
-  exports: [WorkflowLoggerService, WorkflowEventBusService],
+  providers: [WorkflowLoggerService, WorkflowService, WorkflowEventPublisher],
+  exports: [WorkflowLoggerService, WorkflowService, WorkflowEventPublisher],
 })
 export class WorkflowModule {}

@@ -1,20 +1,24 @@
-import { Inject, OnModuleInit } from '@nestjs/common';
-import { WorkflowEvent } from 'src/jobs/interfaces/workflow-event.interface';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Subject } from 'rxjs';
+import { WorkflowEvent } from './interfaces/workflow-event.interface';
+import { REDIS_PUBSUB } from './constants/redis.constants';
+import type { RedisPubSub } from 'src/redis/interfaces/redis-pubsub.interface';
 
-import Redis from 'ioredis';
-export class WorkflowEventSuscriber implements OnModuleInit {
+@Injectable()
+export class WorkflowEventSubscriber implements OnModuleInit {
   private readonly subject = new Subject<WorkflowEvent>();
 
-  constructor(@Inject('REDIS_PUBSUB') private readonly redis: typeof Redis) {}
+  constructor(@Inject(REDIS_PUBSUB) private readonly redis: RedisPubSub) {}
 
-  onModuleInit() {
-    const sub = this.redis.duplicate();
-
-    sub.subscribe('workflow.events');
-
-    sub.on('message', (_, message) => {
-      this.subject.next(JSON.parse(message));
-    });
+  onModuleInit(): void {
+    this.redis.subscribe(
+      'workflow.events',
+      (_channel: string, message: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const event: WorkflowEvent = JSON.parse(message);
+        this.subject.next(event);
+      },
+    );
   }
 
   get stream$() {

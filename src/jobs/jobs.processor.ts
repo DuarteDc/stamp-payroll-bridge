@@ -4,7 +4,8 @@ import { Job as BullJob, Queue } from 'bullmq';
 import { SatService } from 'src/sat/sat.service';
 import { WorkflowLoggerService } from 'src/workflow/workflow-logger.service';
 import { Repository } from 'typeorm';
-import { Job as JobEntity, JobStatus } from './entities/job.entity';
+import { Job as JobEntity } from './entities/job.entity';
+import { JOB_STATUS } from './constants/job-status.constant';
 
 interface PollingQueueData {
   packageId: string;
@@ -44,7 +45,7 @@ export class JobsProcessor extends WorkerHost {
       await this.jobRepository.update(
         { id: job.data.jobId },
         {
-          status: JobStatus.TIMBRADO,
+          status: JOB_STATUS.STAMPED,
         },
       );
       return { success: true };
