@@ -14,7 +14,7 @@ export type AuditActionType =
 export interface AuditActionOptions {
   action?: AuditActionType | null;
   description?: string;
-  path?: string; // 👈 custom path opcional
+  path?: string;
 }
 
 export const AuditAction = (

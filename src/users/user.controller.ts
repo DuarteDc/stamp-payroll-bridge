@@ -119,4 +119,9 @@ export class UserController {
   ) {
     return await this.userService.changeUserPassword(id, changePasswordDto);
   }
+
+  @Get('/profile')
+  async updateProfileData(@GetUser() user: User) {
+    return await new Promise((resolve) => resolve(user));
+  }
 }
