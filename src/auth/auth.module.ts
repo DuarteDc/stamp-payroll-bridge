@@ -8,9 +8,15 @@ import { PassportModule } from '@nestjs/passport';
 import { TokenService } from './token.service';
 import { JWTStrategy } from './strategies/jwt.strategy';
 import { UsersModule } from 'src/users/users.module';
+import { UserSessionService } from './user-session.service';
+import { UserSession } from './entities/user-session.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { JWTRefreshStrategy } from './strategies/jwt-refresh.strategy';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({}), // si usas JwtService
+
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -28,9 +34,17 @@ import { UsersModule } from 'src/users/users.module';
     }),
     PassportModule,
     UsersModule,
+    TypeOrmModule.forFeature([UserSession]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, HashService, JWTStrategy, TokenService],
-  exports: [AuthService, JWTStrategy, TokenService],
+  providers: [
+    AuthService,
+    UserSessionService,
+    HashService,
+    JWTStrategy,
+    JWTRefreshStrategy,
+    TokenService,
+  ],
+  exports: [AuthService, UserSessionService, JWTStrategy, TokenService],
 })
 export class AuthModule {}

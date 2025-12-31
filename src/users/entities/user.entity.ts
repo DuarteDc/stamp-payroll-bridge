@@ -10,6 +10,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { UserSession } from 'src/auth/entities/user-session.entity';
 
 @Entity({ name: 'USERS' })
 export class User {
@@ -43,6 +44,9 @@ export class User {
 
   @OneToMany(() => AuditLog, (audit) => audit.user)
   auditLogs: AuditLog[];
+
+  @OneToMany(() => UserSession, (userSession) => userSession.user)
+  useSessions: UserSession[];
 
   @Column({
     name: 'CREATED_AT',

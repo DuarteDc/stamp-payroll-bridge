@@ -1,15 +1,15 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
-
-import type { JWTPayload } from '../interfaces/jwt-payload.interface';
-import { ConfigService } from '@nestjs/config';
 import { UserService } from 'src/users/user.service';
-import { User } from 'src/users/entities/user.entity';
 import { UserSessionService } from '../user-session.service';
+import { ConfigService } from '@nestjs/config';
+import { JWTPayload } from '../interfaces/jwt-payload.interface';
 @Injectable()
-export class JWTStrategy extends PassportStrategy(Strategy) {
+export class JWTRefreshStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     private readonly userService: UserService,
     private readonly sessionService: UserSessionService,
@@ -24,30 +24,26 @@ export class JWTStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: JWTPayload): Promise<User> {
-    if (payload.type !== 'access') {
-      throw new UnauthorizedException('Invalid token type');
+  async validate(payload: JWTPayload) {
+    if (payload.type !== 'refresh') {
+      throw new UnauthorizedException('Invalid refresh token');
     }
+
     const user = await this.userService.findOne(payload.id);
-    if (!user) throw new UnauthorizedException('Invalid access token');
+    if (!user) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
 
     const session = await this.sessionService.findActiveByUser(user.id);
 
     if (!session) {
       throw new UnauthorizedException('Session expired');
     }
-    const inactiveMinutes = 30;
-    if (
-      session.lastActivityAt &&
-      session.lastActivityAt <
-        new Date(Date.now() - inactiveMinutes * 60 * 1000)
-    ) {
-      await this.sessionService.revoke(session.id);
-      throw new UnauthorizedException('Session inactive');
+
+    if (session.refreshTokenId !== payload.jti) {
+      throw new UnauthorizedException('Refresh token revoked');
     }
 
-    await this.sessionService.touch(session.id);
-
-    return user;
+    return { user, session };
   }
 }

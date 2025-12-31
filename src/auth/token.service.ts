@@ -7,9 +7,10 @@ import { JWTPayload } from './interfaces/jwt-payload.interface';
 export class TokenService {
   constructor(private readonly jwtService: JwtService) {}
 
-  async sign(payload: JWTPayload) {
+  async sign(payload: JWTPayload, expiresIn = 3600) {
     return await this.jwtService.signAsync(payload, {
       secret: envs.jwtSecretKey,
+      expiresIn,
     });
   }
 

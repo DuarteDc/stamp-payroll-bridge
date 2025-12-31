@@ -30,6 +30,7 @@ import { AuditLog } from './audit/entities/audit-log.entity';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './audit/interceptors/audit.interceptor';
 import { RedisModule } from './redis/redis.module';
+import { UserSession } from './auth/entities/user-session.entity';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { RedisModule } from './redis/redis.module';
         WorkflowLog,
         User,
         AuditLog,
+        UserSession,
       ],
       synchronize: true,
     }),
