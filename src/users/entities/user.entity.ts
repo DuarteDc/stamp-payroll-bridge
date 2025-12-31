@@ -10,7 +10,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { UserSession } from 'src/auth/entities/user-session.entity';
+import { UserSession } from '../../auth/entities/user-session.entity';
 
 @Entity({ name: 'USERS' })
 export class User {

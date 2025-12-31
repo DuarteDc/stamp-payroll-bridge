@@ -56,6 +56,7 @@ export class AuthService {
 
     return {
       user,
+      refreshJti: tokens.refreshJti,
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
     };

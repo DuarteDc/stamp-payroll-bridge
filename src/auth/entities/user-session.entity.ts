@@ -28,6 +28,21 @@ export class UserSession {
   @Column({ name: 'USERAGENT', nullable: true })
   userAgent: string;
 
+  @Column({ nullable: true, name: 'DEVICE_TYPE' })
+  deviceType: string;
+
+  @Column({ nullable: true, name: 'DEVICE_BRAND' })
+  deviceBrand: string;
+
+  @Column({ nullable: true, name: 'DEVICE_MODEL' })
+  deviceModel: string;
+
+  @Column({ nullable: true, name: 'OS' })
+  os: string;
+
+  @Column({ nullable: true, name: 'BROWSER' })
+  browser: string;
+
   @Column({
     name: 'CREATED_AT',
     type: 'timestamp',

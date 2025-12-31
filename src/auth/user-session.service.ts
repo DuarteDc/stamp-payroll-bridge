@@ -33,6 +33,16 @@ export class UserSessionService {
       order: { createdAt: 'DESC' },
     });
   }
+
+  findAllActiveByUser(userId: string) {
+    return this.userSessionRepository.find({
+      where: {
+        user: { id: userId },
+        revokedAt: IsNull(),
+      },
+      order: { createdAt: 'DESC' },
+    });
+  }
   touch(id: string) {
     return this.userSessionRepository.update(id, {
       lastActivityAt: new Date(),
