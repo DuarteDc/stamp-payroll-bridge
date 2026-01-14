@@ -16,13 +16,23 @@ import { UserRole } from 'src/auth/interfaces/user-role.interface';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import * as nestjsPaginate from 'nestjs-paginate';
-
+import { User } from 'src/users/entities/user.entity';
+import { User as GetUser } from 'src/auth/decorators/user.decorator';
 @Controller('audit')
-@Roles(UserRole.ADMIN)
 @UseGuards(AuthGuard(), RolesGuard)
 export class AuditController {
   constructor(private readonly auditService: AuditService) {}
+
+  @Get('user')
+  getLogsByAuthenticatedUser(
+    @GetUser() user: User,
+    @nestjsPaginate.Paginate() query: nestjsPaginate.PaginateQuery,
+  ) {
+    return this.auditService.findByUser(user.id, query);
+  }
+
   @Get(':id')
+  @Roles(UserRole.ADMIN)
   findByUser(
     @Param('id') id: string,
     @nestjsPaginate.Paginate() query: nestjsPaginate.PaginateQuery,
@@ -31,6 +41,7 @@ export class AuditController {
   }
 
   @Get('')
+  @Roles(UserRole.ADMIN)
   getAll(
     @nestjsPaginate.Paginate() query: nestjsPaginate.PaginateQuery,
     @Query('date') date?: string,
@@ -40,6 +51,7 @@ export class AuditController {
   }
 
   @Post('track')
+  @Roles(UserRole.ADMIN)
   tranckFrontend(@Body() body: { path: string }, @Req() request: Request) {
     return this.auditService.create({
       ip: request.ip ?? '',
