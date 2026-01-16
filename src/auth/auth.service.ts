@@ -12,6 +12,8 @@ import { User } from 'src/users/entities/user.entity';
 import { randomUUID } from 'crypto';
 import { UserSessionService } from './user-session.service';
 import { UserSession } from './entities/user-session.entity';
+import { ChangePasswordDto } from 'src/users/dto';
+import { UpdateUserDataDto } from 'src/audit/dtos/update-user-data.dto';
 
 @Injectable()
 export class AuthService {
@@ -80,5 +82,17 @@ export class AuthService {
       refreshJti,
       refreshToken,
     };
+  }
+
+  async updateMyPassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    return await this.userService.changeUserPassword(userId, changePasswordDto);
+  }
+
+  async updateProfileData(user: User, updateUserDataDto: UpdateUserDataDto) {
+    return await this.userService.updateUser(
+      user.id,
+      updateUserDataDto,
+      user.tenant,
+    );
   }
 }

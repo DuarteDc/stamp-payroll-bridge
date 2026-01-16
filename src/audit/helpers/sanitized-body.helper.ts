@@ -16,8 +16,8 @@ export const sanitizedBody = (body: any) => {
   ];
   const clone = { ...body };
   for (const key of Object.keys(clone)) {
-    if (sensitiveKeys.includes(key.toLowerCase())) {
-      clone[key] = '*******************';
+    if (sensitiveKeys.includes(key)) {
+      clone[key] = '***************************************************';
     } else if (typeof clone[key] === 'object') {
       clone[key] = sanitizedBody(clone[key]);
     }

@@ -106,8 +106,6 @@ export class UserService {
     id: string,
     { password, confirmPassword }: ChangePasswordDto,
   ) {
-    console.log(password);
-    console.log(confirmPassword);
     if (password !== confirmPassword)
       throw new BadRequestException('Las contraseñas no coinciden');
     const hashedPassword = this.hashService.getHashPassword(password);

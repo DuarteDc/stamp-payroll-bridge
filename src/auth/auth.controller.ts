@@ -1,11 +1,19 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import type { Request } from 'express';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { LoginTenantDto } from './dto';
 import { AuthService } from './auth.service';
 
 import { User } from 'src/users/entities/user.entity';
 import { AuditAction } from 'src/audit/decorators/audit-action.decorator';
 import { UserSessionService } from './user-session.service';
-import type { Request } from 'express';
 import dayjs from 'dayjs';
 import { JWTRefreshGuard } from './guards/jwt-refresh.guard';
 import { Session } from './decorators/session.decorator';
@@ -13,6 +21,9 @@ import { UserSession } from './entities/user-session.entity';
 import { User as GetUser } from './decorators/user.decorator';
 import { AuthGuard } from '@nestjs/passport';
 import { parseUserAgent } from './utils/parse-user-agent.util';
+import { ChangePasswordDto } from 'src/users/dto';
+import { UpdateUserDataDto } from 'src/audit/dtos/update-user-data.dto';
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -56,5 +67,25 @@ export class AuthController {
   @UseGuards(AuthGuard())
   getSessions(@GetUser() user: User) {
     return this.userSessionService.findAllActiveByUser(user.id);
+  }
+  @AuditAction('update', 'Actualizó su contraseña', '/admin/profile')
+  @Patch('change-password')
+  @UseGuards(AuthGuard())
+  chnagePassword(
+    @GetUser() user: User,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    return this.authService.updateMyPassword(user.id, changePasswordDto);
+  }
+
+  @AuditAction('update', 'Actualizó su información personal', '/admin/profile')
+  @Patch('update-data')
+  @UseGuards(AuthGuard())
+  updateUserData(
+    @GetUser() user: User,
+    @Body() updateUserDataDto: UpdateUserDataDto,
+  ) {
+    console.log(user);
+    return this.authService.updateProfileData(user, updateUserDataDto);
   }
 }
