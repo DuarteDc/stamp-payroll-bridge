@@ -85,7 +85,6 @@ export class AuthController {
     @GetUser() user: User,
     @Body() updateUserDataDto: UpdateUserDataDto,
   ) {
-    console.log(user);
     return this.authService.updateProfileData(user, updateUserDataDto);
   }
 }

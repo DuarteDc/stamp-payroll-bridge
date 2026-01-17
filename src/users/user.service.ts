@@ -118,4 +118,13 @@ export class UserService {
       );
     return await this.findOne(id);
   }
+
+  async checkIfUsernameIsValid(username: string, userId: string) {
+    return await this.userRepository.findOne({
+      where: {
+        id: Not(userId),
+        username,
+      },
+    });
+  }
 }

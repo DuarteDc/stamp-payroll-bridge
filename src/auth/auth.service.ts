@@ -89,6 +89,25 @@ export class AuthService {
   }
 
   async updateProfileData(user: User, updateUserDataDto: UpdateUserDataDto) {
+    if (!updateUserDataDto.username) {
+      return await this.userService.updateUser(
+        user.id,
+        updateUserDataDto,
+        user.tenant,
+      );
+    }
+
+    const isUsernameValid = await this.userService.checkIfUsernameIsValid(
+      updateUserDataDto.username,
+      user.id,
+    );
+
+    if (isUsernameValid) {
+      throw new BadRequestException(
+        `El nombre de usuario ${updateUserDataDto.username} ya ha sido usado`,
+      );
+    }
+
     return await this.userService.updateUser(
       user.id,
       updateUserDataDto,
