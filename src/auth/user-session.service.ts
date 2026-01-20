@@ -24,10 +24,11 @@ export class UserSessionService {
     });
   }
 
-  findActiveByUser(userId: string) {
+  findActiveByUser(userId: string, sessionId: string) {
     return this.userSessionRepository.findOne({
       where: {
         user: { id: userId },
+        refreshTokenId: sessionId,
         revokedAt: IsNull(),
       },
       order: { createdAt: 'DESC' },

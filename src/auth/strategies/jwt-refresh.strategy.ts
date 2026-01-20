@@ -34,8 +34,10 @@ export class JWTRefreshStrategy extends PassportStrategy(
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const session = await this.sessionService.findActiveByUser(user.id);
-
+    const session = await this.sessionService.findActiveByUser(
+      user.id,
+      payload.jti!,
+    );
     if (!session) {
       throw new UnauthorizedException('Session expired');
     }
@@ -43,6 +45,19 @@ export class JWTRefreshStrategy extends PassportStrategy(
     if (session.refreshTokenId !== payload.jti) {
       throw new UnauthorizedException('Refresh token revoked');
     }
+
+    const inactiveMinutes = 30;
+
+    if (
+      session.lastActivityAt &&
+      session.lastActivityAt <
+        new Date(Date.now() - inactiveMinutes * 60 * 1000)
+    ) {
+      await this.sessionService.revoke(session.id);
+      throw new UnauthorizedException('Session inactive');
+    }
+
+    await this.sessionService.touch(session.id);
 
     return { user, session };
   }

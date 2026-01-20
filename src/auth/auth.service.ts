@@ -46,6 +46,7 @@ export class AuthService {
   }
 
   async refreshTokens(session: UserSession, user: User) {
+    console.log(session);
     if (session.revokedAt) {
       throw new UnauthorizedException('Session revoked');
     }

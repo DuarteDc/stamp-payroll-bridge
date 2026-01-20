@@ -68,6 +68,13 @@ export class AuthController {
   getSessions(@GetUser() user: User) {
     return this.userSessionService.findAllActiveByUser(user.id);
   }
+
+  @Get('/logout')
+  @UseGuards(JWTRefreshGuard)
+  logout(@Session() { session }: { session: UserSession }) {
+    return this.userSessionService.revoke(session.id);
+  }
+
   @AuditAction('update', 'Actualizó su contraseña', '/admin/profile')
   @Patch('change-password')
   @UseGuards(AuthGuard())
