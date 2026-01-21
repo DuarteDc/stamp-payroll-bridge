@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Patch,
   Post,
   Req,
@@ -83,6 +84,11 @@ export class AuthController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     return this.authService.updateMyPassword(user.id, changePasswordDto);
+  }
+
+  @Post('/logout/:id')
+  logoutOneSession(@Param('id') id: string) {
+    return this.userSessionService.revoke(id);
   }
 
   @AuditAction('update', 'Actualizó su información personal', '/admin/profile')
