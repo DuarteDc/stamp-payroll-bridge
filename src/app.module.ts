@@ -31,6 +31,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuditInterceptor } from './audit/interceptors/audit.interceptor';
 import { RedisModule } from './redis/redis.module';
 import { UserSession } from './auth/entities/user-session.entity';
+import { oracleTypeOrmConfig } from './datasource/oracle/typeorm.config';
 
 @Module({
   imports: [
@@ -48,27 +49,39 @@ import { UserSession } from './auth/entities/user-session.entity';
     }),
     StampModule,
     UnzipModule,
-    TypeOrmModule.forRoot({
-      type: 'oracle',
-      host: envs.dbHost,
-      port: envs.dbPort,
-      username: envs.dbUsername,
-      schema: envs.dbSchema,
-      serviceName: envs.dbSid,
-      password: envs.dbPassword,
-      entities: [
-        Job,
-        JobEvent,
-        Certificate,
-        Tenant,
-        BlobConfig,
-        WorkflowLog,
-        User,
-        AuditLog,
-        UserSession,
-      ],
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(oracleTypeOrmConfig),
+    TypeOrmModule.forFeature([
+      Job,
+      JobEvent,
+      Certificate,
+      Tenant,
+      BlobConfig,
+      WorkflowLog,
+      User,
+      AuditLog,
+      UserSession,
+    ]),
+    // TypeOrmModule.forRoot({
+    //   type: 'oracle',
+    //   host: envs.dbHost,
+    //   port: envs.dbPort,
+    //   username: envs.dbUsername,
+    //   schema: envs.dbSchema,
+    //   serviceName: envs.dbSid,
+    //   password: envs.dbPassword,
+    //   entities: [
+    //     Job,
+    //     JobEvent,
+    //     Certificate,
+    //     Tenant,
+    //     BlobConfig,
+    //     WorkflowLog,
+    //     User,
+    //     AuditLog,
+    //     UserSession,
+    //   ],
+    //   synchronize: true,
+    // }),
     TenantModule,
     BullModule.forRoot({
       connection: {

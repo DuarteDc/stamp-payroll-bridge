@@ -34,6 +34,16 @@ export class WorkflowLog {
   @Column({ type: 'varchar', default: 'pending', name: 'STATUS' })
   status: 'start' | 'pending' | 'success' | 'error';
 
+  @Column({ name: 'ATTEMPTS', type: 'int', default: 1 })
+  attempts: number;
+
+  @Column({
+    name: 'LAST_UPDATE',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  lastUpdate: Date;
+
   @CreateDateColumn()
   timestamp: Date;
 }
